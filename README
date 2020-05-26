@@ -1,0 +1,4 @@
+mvn compile assembly:single
+
+ln -s $(pwd)/target/bpcompiler-0.0.1-SNAPSHOT-jar-with-dependencies.jar /media/fabio/DATA/Source/Spring/eflow/target/bpcompiler
+
