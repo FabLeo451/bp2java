@@ -89,7 +89,7 @@ abstract class BPNode {
     String autoCode = "";
     
     if (type != OPERATOR)
-      autoCode = "// Node: "+getName() + System.lineSeparator() + System.lineSeparator();
+      autoCode = System.lineSeparator() + System.lineSeparator() + "// Node: "+getName() + System.lineSeparator() + System.lineSeparator();
     
     if (javaInputArray) {
       String a = "_"+getId()+"_in";

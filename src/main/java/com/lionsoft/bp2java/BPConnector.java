@@ -108,9 +108,12 @@ class BPConnector {
     if (jc.containsKey("value")) {
       switch (dataType) {
         case INT:
-        case FLOAT:
         case BOOLEAN:
           value = (Object) jc.get("value");
+          break;
+
+        case FLOAT:
+          value = jc.get("value") instanceof Long ? ((Long)jc.get("value")).doubleValue() : jc.get("value");
           break;
 
         case STRING:

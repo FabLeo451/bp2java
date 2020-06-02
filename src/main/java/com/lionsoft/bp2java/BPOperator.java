@@ -28,9 +28,9 @@ public class BPOperator extends BPNode {
   public String getCode() {
     String code;
     
-    //System.out.println(getName()+" "+java);
+    //System.out.println(getName()+": java = "+java);
     
-    if (java != null) {
+    if (java != null && !java.isEmpty()) {
       // Update java template
       
       code = java;
@@ -46,6 +46,7 @@ public class BPOperator extends BPNode {
     }
     else {
       // Concatenate operands with operator symbol
+      //System.out.println(getName()+": Using symbol "+symbol);
       
       code = "(" + getInputConnector(0).getValueAsString();
       
@@ -55,6 +56,8 @@ public class BPOperator extends BPNode {
       
       code += ")";
     }
+    
+    //System.out.println(getName()+ ": " + code);
     
     return code;
   }
