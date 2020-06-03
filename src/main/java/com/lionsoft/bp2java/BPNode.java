@@ -172,8 +172,23 @@ abstract class BPNode {
     if (jn.containsKey("jar")) {
       JSONArray ja = (JSONArray) jn.get("jar");
       
+      // If path is present maybe we have "jar":"{path}/jarname.jar"
+      String path = null;
+      
+      if (jn.containsKey("data")) {
+        JSONObject jdata = (JSONObject) jn.get("data");
+        path = jdata.containsKey("path") ? (String) jdata.get("path") : null;
+      }
+      
+      //System.out.println(getName()+" path: "+path);
+      
       for (int i=0; i < ja.size(); i++) {
-        jarList.add((String)ja.get(i));
+        String jar = (String)ja.get(i);
+        
+        if (path != null)
+          jar = jar.replace("{path}", path);
+        
+        jarList.add(jar);
       }
     }
     
