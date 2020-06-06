@@ -169,6 +169,8 @@ abstract class BPNode {
       }
     }
     
+    /*
+    // Done by JLogic when compiling
     if (jn.containsKey("jar")) {
       JSONArray ja = (JSONArray) jn.get("jar");
       
@@ -191,6 +193,7 @@ abstract class BPNode {
         jarList.add(jar);
       }
     }
+    */
     
     JSONArray jConnectorArray = (JSONArray) jn.get("input");
     

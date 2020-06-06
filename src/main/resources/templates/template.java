@@ -78,8 +78,8 @@ public class {className} {
           break;
 
         case 'h':
-          System.out.println("Help");
-          break;
+          _help();
+          System.exit(0);
 
         case '?':
           System.out.println("The option '" + (char)g.getOptopt() + "' is not valid");
@@ -117,7 +117,21 @@ public class {className} {
   public static BPContext _getContext() {
     return (context);
   }
-   
+  
+  /**
+   * _help()
+   */
+  public static void _help() {
+    System.out.println(System.lineSeparator() +
+                       "bp2java" + System.lineSeparator() +
+                       "--warn           Set log level to WARN." + System.lineSeparator() +
+                       "--trace          Set log level to TRACE." + System.lineSeparator() +
+                       "--debug          Set log level to DEBUG." + System.lineSeparator() +
+                       "-p, --properties Set properties file." + System.lineSeparator() +
+                       "-L, --logpath    Set log path." + System.lineSeparator() +
+                       System.lineSeparator());
+  }
+  
   /**
    * _init()
    */
