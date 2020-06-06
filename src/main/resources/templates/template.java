@@ -201,6 +201,8 @@ public class {className} {
     if (context != null)
       context.setResult(code, message);
       
+    System.err.println(message+" (code: "+code+")");
+      
     throw new ExitException(message);
   }
   
