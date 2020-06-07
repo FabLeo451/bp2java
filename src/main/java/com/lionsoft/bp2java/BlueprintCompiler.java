@@ -56,7 +56,8 @@ public class BlueprintCompiler {
           break;
           
         case 'b':
-          program.addBlueprint (g.getOptarg());
+          if (!program.addBlueprint (g.getOptarg()))
+            System.exit(1);
           break;
           
         case 'P':

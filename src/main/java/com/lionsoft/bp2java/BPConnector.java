@@ -37,6 +37,7 @@ class BPConnector {
   String fixedOutput; // For output connectors, a fixed string to be returned
   int dimensions;
   Reference references;
+  //Boolean mustConnect;
   
   /*int must_connect;
   int not_null;*/
@@ -60,6 +61,7 @@ class BPConnector {
     connectedTo = null;
     fixedOutput = null;
     references = null;
+    //mustConnect = false;
   }
    
   public BPConnector(int direction, JSONObject jc) {
@@ -73,6 +75,9 @@ class BPConnector {
     setExec((Boolean)jc.get("exec"));
     setDimensions(((Long)jc.get("dimensions")).intValue());
     
+    /*if (jc.containsKey("must_connect"))
+      setMustConnect((Boolean)jc.get("must_connect"));*/
+
     setDirection(direction);
     
     if (jc.containsKey("reference_id"))
@@ -211,6 +216,19 @@ class BPConnector {
   public Boolean getExec () {
     return (exec);
   }
+
+  public boolean mustBeConnected() {
+    return (!getExec() && getValue() == null);
+  }
+
+  /*
+  public void setMustConnect (Boolean b) {
+    this.mustConnect = b;
+  }
+  
+  public Boolean getMustConnect () {
+    return (this.mustConnect);
+  }*/
   
   public void setNode (BPNode node) {
     this.node = node;
@@ -240,7 +258,7 @@ class BPConnector {
     return (isConnected() ? connectedTo.getNode() : null);
   }
 
-  public Boolean isConnected() {
+  public boolean isConnected() {
     return (connectedTo != null);
   }
   
@@ -258,6 +276,10 @@ class BPConnector {
   
   public void setValue(Object v) {
     value = v;
+  }
+  
+  public Object getValue() {
+    return(value);
   }
 
   public String getValueAsString() {

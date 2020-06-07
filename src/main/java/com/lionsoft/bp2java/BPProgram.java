@@ -59,14 +59,18 @@ public class BPProgram {
     return (blueprintList);
   }
 
-  public void addBlueprint (String filename) {
+  public boolean addBlueprint (String filename) {
     Blueprint b = new Blueprint ();
     b.setProgram(this);
     
-    if (b.load(filename) != Blueprint.SUCCESS)
+    if (b.load(filename) != Blueprint.SUCCESS) {
       System.err.println("Error loading blueprint "+filename);
+      return false;
+    }
 
     blueprintList.add(b);
+    
+    return true;
   }
 
   public void importPackage (String p) {

@@ -21,6 +21,7 @@ public class Blueprint {
   public final static int ERR_FILE_NOT_FOUND = 1;
   public final static int ERR_IO = 2;
   public final static int ERR_JSON_PARSING = 3;
+  public final static int ERR_MUST_CONNECT = 4;
 
   JSONObject jbp;
   
@@ -139,7 +140,7 @@ public class Blueprint {
         
         types.put(key, (String)jtype.get("name"));
         
-        System.out.println(key +" "+ (String)types.get(key));
+        //System.out.println(key +" "+ (String)types.get(key));
       }
     }
         
@@ -314,7 +315,11 @@ public class Blueprint {
     
     
     for (BPNode node : nodes) {
-      //BPNode node = (BPNode)
+      if (!node.check()) {
+        System.err.println(node.getMessage());
+        return (ERR_MUST_CONNECT);
+      }
+      
       node.initCode();
     }
 

@@ -45,6 +45,7 @@ abstract class BPNode {
   private boolean javaInputArray = false;
 
   Boolean compiled;         /* Already compiled (to avoid loops) */
+  String message;
    
   public BPNode() {
     input = new ArrayList<BPConnector>();
@@ -82,6 +83,27 @@ abstract class BPNode {
   
   public String getName () {
     return (name);
+  }
+  
+  public String getMessage () {
+    return (message);
+  }
+  
+  public boolean check () {
+    //System.out.println("Checking "+getName()+ " ("+nIn+" connectors)");
+
+    for (int i=0; i<nIn; i++) {
+      BPConnector c = getInputConnector(i);
+      
+      //System.out.println("  "+i+" "+c.getLabel()+" connected:"+c.isConnected()+" value:"+c.getValue());
+            
+      if (c.mustBeConnected() && !c.isConnected()) {
+        message = "Connector '"+c.getLabel()+"' of node '"+getName()+"' should be connected.";
+        return false;
+      }
+    }
+    
+    return true;
   }
   
   public String initCode () {
