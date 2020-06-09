@@ -29,7 +29,9 @@ public class Blueprint {
   private String name, method;
   private int type;
   
-  Map types;
+  Map<Integer, String> types;   // Deprecated
+  Map<String, BPType> mapTypes; // Type name is the key
+  
   BPEntryPoint entryPointNode;
   BPReturn returnNode;
   List<BPNode> nodes;
@@ -53,12 +55,19 @@ public class Blueprint {
     
     // Standard types
     // {"_exec_", "int", "float", "String", "Boolean"};
-    types = new HashMap();
+    types = new HashMap<Integer, String>();
     types.put(0, "_exec");
     types.put(1, "Integer");
     types.put(2, "Double");
     types.put(3, "String");
     types.put(4, "Boolean");
+    
+    mapTypes = new HashMap<String, BPType>();
+    mapTypes.put("_exec", new BPType(0, "_exec", null));
+    mapTypes.put("Integer", new BPType(1, "Integer", null));
+    mapTypes.put("Double", new BPType(2, "Double", null));
+    mapTypes.put("String", new BPType(3, "String", null));
+    mapTypes.put("Boolean", new BPType(4, "Boolean", null));
   }
 /* 
   public Blueprint(String filename) {
@@ -129,18 +138,23 @@ public class Blueprint {
     type = ((Long) jbp.get("type")).intValue();
     method = jbp.containsKey("method") ? (String) jbp.get("method") : name.replace(" ", "_");
     
-    // Types
+    // Types: convert json array into <1,Integer> <2;FLoat> ecc...
     
     if (jbp.containsKey("types")) {
       JSONArray jTypesArray = (JSONArray) jbp.get("types");
     
       for (int i = 0; i < jTypesArray.size(); i++) {
         JSONObject jtype = (JSONObject) jTypesArray.get(i);
-        int key = ((Long)jtype.get("id")).intValue();
+        int id = ((Long)jtype.get("id")).intValue();
         
-        types.put(key, (String)jtype.get("name"));
+        types.put(id, (String)jtype.get("name"));
         
         //System.out.println(key +" "+ (String)types.get(key));
+        
+        mapTypes.put((String) jtype.get("name"), 
+                     new BPType(id, 
+                                (String) jtype.get("name"), 
+                                jtype.containsKey("init") ? (String) jtype.get("init") : null));
       }
     }
         
@@ -156,7 +170,13 @@ public class Blueprint {
       BPVariable v = new BPVariable(jvar);
       variables.add(v);
       
-      declareSection += v.getTypeName() + " " + v.getName() + " = " + v.getValueStr() + ";" + System.lineSeparator();
+      System.out.println(v.getTypeName() + " " + v.getName() + " " + v.getValue());
+      System.out.println(mapTypes.get(v.getTypeName()).toString());
+      
+      declareSection += v.getTypeName() + " " + 
+                        v.getName() + " = " + 
+                        (v.getValue() != null ? v.getValueStr() : mapTypes.get(v.getTypeName()).getInitString()) + ";" + 
+                        System.lineSeparator();
     }
         
     // Nodes
@@ -355,7 +375,7 @@ public class Blueprint {
           break;
       }
         
-      parameters += /*BPConnector.typeToString(entryPointNode.getOutputConnector(i).getDataType())*/(String) types.get(entryPointNode.getOutputConnector(i).getDataType()) + dim + " " + entryPointNode.getOutputConnector(i).getLabel();
+      parameters += (String) types.get(entryPointNode.getOutputConnector(i).getDataType()) + dim + " " + entryPointNode.getOutputConnector(i).getLabel();
     }
     
     header = scope + " " + returnType + " " + getMethodName() + "("+parameters+") throws ExitException ";

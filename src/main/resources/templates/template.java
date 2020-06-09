@@ -123,12 +123,14 @@ public class {className} {
    */
   public static void _help() {
     System.out.println(System.lineSeparator() +
-                       "bp2java" + System.lineSeparator() +
-                       "--warn           Set log level to WARN." + System.lineSeparator() +
-                       "--trace          Set log level to TRACE." + System.lineSeparator() +
-                       "--debug          Set log level to DEBUG." + System.lineSeparator() +
-                       "-p, --properties Set properties file." + System.lineSeparator() +
-                       "-L, --logpath    Set log path." + System.lineSeparator() +
+                       "{programName}" + System.lineSeparator() +
+                       System.lineSeparator() +
+                       "Options:" + System.lineSeparator() +
+                       "  --warn           Set log level to WARN." + System.lineSeparator() +
+                       "  --trace          Set log level to TRACE." + System.lineSeparator() +
+                       "  --debug          Set log level to DEBUG." + System.lineSeparator() +
+                       "  -p, --properties Set properties file." + System.lineSeparator() +
+                       "  -L, --logpath    Set log path." + System.lineSeparator() +
                        System.lineSeparator());
   }
   
