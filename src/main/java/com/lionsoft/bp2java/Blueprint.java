@@ -144,12 +144,14 @@ public class Blueprint {
       JSONArray jTypesArray = (JSONArray) jbp.get("types");
     
       for (int i = 0; i < jTypesArray.size(); i++) {
+        // Deprecated list (id is the key)
+        
         JSONObject jtype = (JSONObject) jTypesArray.get(i);
         int id = ((Long)jtype.get("id")).intValue();
         
         types.put(id, (String)jtype.get("name"));
         
-        //System.out.println(key +" "+ (String)types.get(key));
+        // New list (name is the key)
         
         mapTypes.put((String) jtype.get("name"), 
                      new BPType(id, 
@@ -170,8 +172,8 @@ public class Blueprint {
       BPVariable v = new BPVariable(jvar);
       variables.add(v);
       
-      System.out.println(v.getTypeName() + " " + v.getName() + " " + v.getValue());
-      System.out.println(mapTypes.get(v.getTypeName()).toString());
+      //System.out.println(v.getTypeName() + " " + v.getName() + " " + v.getValue());
+      //System.out.println(mapTypes.get(v.getTypeName()).toString());
       
       declareSection += v.getTypeName() + " " + 
                         v.getName() + " = " + 
