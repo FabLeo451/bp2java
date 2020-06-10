@@ -2,10 +2,6 @@ package com.lionsoft.bp2java;
 
 class BPType {
 
-  public final static int SCALAR = 0;
-  public final static int ARRAY = 1;
-  public final static int MATRIX = 2;
-
   int id = 0;
   String name = null;
   String init = null;
@@ -19,6 +15,10 @@ class BPType {
     this.id = id;
     this.name = name;
     this.init = init;
+  }
+ 
+  public BPType(String name) {
+    this(0, name, null);
   }
   
   public String toString() {

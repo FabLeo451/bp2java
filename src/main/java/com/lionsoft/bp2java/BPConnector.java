@@ -30,13 +30,14 @@ class BPConnector {
   String label;
   Boolean exec;
   int pinType;
-  String pinTypeName;
+  String pinTypeName; // Can be EXEC
   int dataType;
   String dataTypeName;
   Object value;
   String fixedOutput; // For output connectors, a fixed string to be returned
   int dimensions;
   Reference references;
+  BPType type; // This is data type
   //Boolean mustConnect;
   
   /*int must_connect;
@@ -67,13 +68,16 @@ class BPConnector {
   public BPConnector(int direction, JSONObject jc) {
     this();
     
-    setId(((Long)jc.get("id")).intValue());
-    setLabel((String)jc.get("label"));
-    setDataType(((Long)jc.get("dataType")).intValue());
-    setPinType(((Long)jc.get("pinType")).intValue());
-    setPinTypeName((String)jc.get("pinTypeName"));
-    setExec((Boolean)jc.get("exec"));
-    setDimensions(((Long)jc.get("dimensions")).intValue());
+    setId(((Long) jc.get("id")).intValue());
+    setLabel((String) jc.get("label"));
+    setDataType(((Long) jc.get("dataType")).intValue());
+    setDataTypeName((String) jc.get("dataTypeName"));
+    setPinType(((Long) jc.get("pinType")).intValue());
+    setPinTypeName((String) jc.get("pinTypeName"));
+    setExec((Boolean) jc.get("exec"));
+    setDimensions(((Long) jc.get("dimensions")).intValue());
+    
+    type = new BPType((String) jc.get("dataTypeName"));
     
     /*if (jc.containsKey("must_connect"))
       setMustConnect((Boolean)jc.get("must_connect"));*/
@@ -93,15 +97,16 @@ class BPConnector {
         
         if (jref.containsKey("input")) {
           // Reference an input variable
-          references = new Reference(  ((Long)jref.get("input")).intValue());
+          references = new Reference(((Long)jref.get("input")).intValue());
+        }
+        else if (jref.containsKey("variable")) {
+          // Reference a variable
+          // "references": {"variable":"varName"}
+          String arrayAttr = dimensions == 0 ? "" : (dimensions == 1 ? "[]" : "[][]");
+          createReferenceLocalVariable (type.getName() + arrayAttr, (String) java.get("variable"));
         }
         else {
-          // Reference a new variable
-          /*
-          varName = "_conn_"+(String)jref.get("name")+"_"+id;
-          references = new Reference((String)jref.get("type"), varName);
-          setFixedOutput(varName);
-          */
+          // Reference a new variable (deprecated)
           createReferenceLocalVariable (jref);
         }
         
@@ -133,11 +138,11 @@ class BPConnector {
     }
   }
   
-  public void createReferenceLocalVariable (String type, String name) {
+  public void createReferenceLocalVariable (String decl, String name) {
     String varName = null;
     
     varName = "_conn_"+name+"_"+id;
-    references = new Reference(type, varName);
+    references = new Reference(decl, varName);
     setFixedOutput(varName);
   }
   
@@ -167,6 +172,10 @@ class BPConnector {
   
   public int getDataType () {
     return (dataType);
+  }
+  
+  public void setDataTypeName (String name) {
+    this.dataTypeName = name;
   }
   
   public void setPinType (int type) {
