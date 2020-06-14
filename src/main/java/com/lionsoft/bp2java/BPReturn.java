@@ -6,7 +6,8 @@ import org.json.simple.JSONObject;
 public class BPReturn extends BPNode {
 
   Boolean returnsValueFlag;
-  int returnType;
+  //int returnType;
+  String returnTypeName;
  
   public BPReturn() {
     super();
@@ -19,15 +20,20 @@ public class BPReturn extends BPNode {
     returnsValueFlag = nIn > 1; // Exec is always present
     
     if (returnsValueFlag)
-      returnType = getInputConnector(1).getDataType();
+      //returnType = getInputConnector(1).getDataType();
+      returnTypeName = getInputConnector(1).getDataTypeName();
   }
   
   public Boolean returnsValue() {
     return (returnsValueFlag);
   }
-  
+/*  
   public int getReturnType() {
     return (returnType);
+  }
+*/  
+  public String getReturnTypeName() {
+    return (returnTypeName);
   }
   
   public String getCode() {

@@ -10,6 +10,7 @@ class BPConnector {
   public final static int OUTPUT = 1;
   
   // Type
+  /*
   public final static int EXEC = 0;
   public final static int INT = 1;
   public final static int FLOAT = 2;
@@ -17,6 +18,7 @@ class BPConnector {
   public final static int BOOLEAN = 4;
   public final static int JSON = 5;
   public final static int POINTER = 6;
+  */
   
   // Dimensions
   /*
@@ -29,9 +31,9 @@ class BPConnector {
   int id;
   String label;
   Boolean exec;
-  int pinType;
-  String pinTypeName; // Can be EXEC
-  int dataType;
+  //int pinType;
+  //String pinTypeName; // Can be EXEC
+  //int dataType;
   String dataTypeName;
   Object value;
   String fixedOutput; // For output connectors, a fixed string to be returned
@@ -70,14 +72,16 @@ class BPConnector {
     
     setId(((Long) jc.get("id")).intValue());
     setLabel((String) jc.get("label"));
-    setDataType(((Long) jc.get("dataType")).intValue());
-    setDataTypeName((String) jc.get("dataTypeName"));
-    setPinType(((Long) jc.get("pinType")).intValue());
-    setPinTypeName((String) jc.get("pinTypeName"));
+    //setDataType(((Long) jc.get("dataType")).intValue());
+    //setDataTypeName((String) jc.get("dataTypeName"));
+    //setPinType(((Long) jc.get("pinType")).intValue());
+    //setPinTypeName((String) jc.get("pinTypeName"));
+    setDataTypeName((String) jc.get("dataType"));
     setExec((Boolean) jc.get("exec"));
     setDimensions(((Long) jc.get("dimensions")).intValue());
     
-    type = new BPType((String) jc.get("dataTypeName"));
+    //type = new BPType((String) jc.get("dataTypeName"));
+    type = new BPType((String) jc.get("dataType"));
     
     /*if (jc.containsKey("must_connect"))
       setMustConnect((Boolean)jc.get("must_connect"));*/
@@ -116,6 +120,7 @@ class BPConnector {
     }
     
     if (jc.containsKey("value")) {
+      /*
       switch (dataType) {
         case INT:
         case BOOLEAN:
@@ -135,6 +140,17 @@ class BPConnector {
         default:
           break;
       }
+      */
+      
+      if (dataTypeName.equals("Integer") || dataTypeName.equals("Boolean"))
+        value = (Object) jc.get("value");
+      else if (dataTypeName.equals("Double"))
+        value = jc.get("value") instanceof Long ? ((Long)jc.get("value")).doubleValue() : jc.get("value");
+      else if (dataTypeName.equals("String"))
+        value = (Object) ((String)jc.get("value")).replace("\\","\\\\").replace("\n","\\n").replace("\"","\\\"");
+      else {
+      
+      }
     }
   }
   
@@ -151,7 +167,7 @@ class BPConnector {
   }
 
   public String toString() {
-    return("BPConnector [id="+id+", type="+dataType+", label="+label+"]");
+    return("BPConnector [id="+id+", type="+dataTypeName+", label="+label+"]");
   }
 
   public void setReference(Reference r) {
@@ -165,7 +181,7 @@ class BPConnector {
   public int getId () {
     return (id);
   }
-  
+/*  
   public void setDataType (int type) {
     this.dataType = type;
   }
@@ -173,11 +189,16 @@ class BPConnector {
   public int getDataType () {
     return (dataType);
   }
+*/  
+  
+  public String getDataTypeName () {
+    return (dataTypeName);
+  }
   
   public void setDataTypeName (String name) {
     this.dataTypeName = name;
   }
-  
+/*  
   public void setPinType (int type) {
     this.pinType = type;
   }
@@ -185,7 +206,7 @@ class BPConnector {
   public int getPinType () {
     return (pinType);
   }
-  
+
   public void setPinTypeName (String name) {
     this.pinTypeName = name;
   }
@@ -193,7 +214,7 @@ class BPConnector {
   public String getPinTypeName () {
     return (pinTypeName);
   }
-  
+*/
   public void setLabel (String label) {
     this.label = label;
   }

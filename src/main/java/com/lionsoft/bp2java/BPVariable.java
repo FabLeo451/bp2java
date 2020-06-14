@@ -9,7 +9,7 @@ class BPVariable {
   public final static int MATRIX = 2;
 
   int id;
-  int type;
+  //int type;
   String typeName;
   String name;
   Object value; // Initial value
@@ -21,7 +21,7 @@ class BPVariable {
     dimensions = SCALAR;
     name = "unnamed";
   }
- 
+/* 
   public BPVariable(int id, int type, int dimensions, String name) {
     this();
     
@@ -35,16 +35,16 @@ class BPVariable {
     this(id, type, dimensions, name);
     setValue(value);
   }
- 
+*/ 
   public BPVariable(JSONObject jvar) {
     this();
     
     this.id = ((Long)jvar.get("id")).intValue();
-    this.type = ((Long)jvar.get("type")).intValue();
+    //this.type = ((Long)jvar.get("type")).intValue();
     this.typeName = (String) jvar.get("typeName");
     this.name = (String) jvar.get("name");
     this.value = (Object) jvar.get("value");
-      
+/*      
     switch (this.type) {
       case BPConnector.INT:
         valueStr = Long.toString((Long) this.value);
@@ -66,6 +66,18 @@ class BPVariable {
         valueStr = "null";
         break;
     }
+*/
+    if (typeName.equals("Integer"))
+      valueStr = Long.toString((Long) this.value);
+    else if (typeName.equals("Boolean"))
+      valueStr = (Boolean) this.value ? "Boolean.TRUE" : "Boolean.FALSE";
+    else if (typeName.equals("Double"))
+      valueStr = Double.toString((Double) this.value);
+    else if (typeName.equals("String"))
+      valueStr = "\"" + ((String) jvar.get("value")).replace("\n","\\n").replace("\"","\\\"") + "\"";
+    else 
+      valueStr = "null";
+    
   }
   
   public void setValue(Object v) {
@@ -83,11 +95,11 @@ class BPVariable {
   public String getName() {
     return (name);
   }
-  
+/*  
   public int getType() {
     return (type);
   }
-  
+*/  
   public String getTypeName() {
     return (typeName);
   }

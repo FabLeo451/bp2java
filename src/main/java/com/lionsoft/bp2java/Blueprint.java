@@ -208,7 +208,7 @@ public class Blueprint {
           nodes.add(returnNode);
           
           if (returnNode.returnsValue())
-            System.out.println("Returns "+returnNode.getReturnType()+" "+(String) types.get(returnNode.getReturnType()));
+            System.out.println("Returns "+returnNode.getReturnTypeName());
           break;
           
         case BPNode.SEQUENCE:
@@ -354,7 +354,8 @@ public class Blueprint {
     
     //scope = (getType() == Blueprint.MAIN) ? "public static" : "public";
     scope = "public static";
-    returnType = returnNode.returnsValue() ? /*BPConnector.typeToString(returnNode.getReturnType())*/ (String) types.get(returnNode.getReturnType()) : "void";
+    //returnType = returnNode.returnsValue() ? /*BPConnector.typeToString(returnNode.getReturnType())*/ (String) types.get(returnNode.getReturnType()) : "void";
+    returnType = returnNode.returnsValue() ? returnNode.getReturnTypeName() : "void";
     
     //System.out.println("nIn = "+entryPointNode.getInputParamsCount());
     for (int i=1; i<entryPointNode.getOutputParamsCount(); i++) {
@@ -377,7 +378,7 @@ public class Blueprint {
           break;
       }
         
-      parameters += (String) types.get(entryPointNode.getOutputConnector(i).getDataType()) + dim + " " + entryPointNode.getOutputConnector(i).getLabel();
+      parameters += /*(String) types.get(entryPointNode.getOutputConnector(i).getDataType())*/ entryPointNode.getOutputConnector(i).getDataTypeName() + dim + " " + entryPointNode.getOutputConnector(i).getLabel();
     }
     
     header = scope + " " + returnType + " " + getMethodName() + "("+parameters+") throws ExitException ";
