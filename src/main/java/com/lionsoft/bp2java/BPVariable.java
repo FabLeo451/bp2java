@@ -70,17 +70,18 @@ class BPVariable {
         break;
     }
 */
-    if (typeName.equals("Integer"))
-      valueStr = Long.toString((Long) this.value);
-    else if (typeName.equals("Boolean"))
-      valueStr = (Boolean) this.value ? "Boolean.TRUE" : "Boolean.FALSE";
-    else if (typeName.equals("Double"))
-      valueStr = Double.toString((Double) this.value);
-    else if (typeName.equals("String"))
-      valueStr = "\"" + ((String) jvar.get("value")).replace("\n","\\n").replace("\"","\\\"") + "\"";
-    else 
-      valueStr = "null";
-    
+    if (this.value != null) {
+      if (typeName.equals("Integer"))
+        valueStr = Long.toString((Long) this.value);
+      else if (typeName.equals("Boolean"))
+        valueStr = (Boolean) this.value ? "Boolean.TRUE" : "Boolean.FALSE";
+      else if (typeName.equals("Double"))
+        valueStr = Double.toString((Double) this.value);
+      else if (typeName.equals("String"))
+        valueStr = "\"" + ((String) jvar.get("value")).replace("\n","\\n").replace("\"","\\\"") + "\"";
+      else 
+        valueStr = "null";
+    }   
   }
   
   public void setValue(Object v) {
