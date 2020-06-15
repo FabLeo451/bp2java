@@ -1,5 +1,6 @@
 package com.lionsoft.bp2java;
 
+import java.util.UUID;
 import org.json.simple.JSONObject;
 
 class BPVariable {
@@ -8,7 +9,8 @@ class BPVariable {
   public final static int ARRAY = 1;
   public final static int MATRIX = 2;
 
-  int id;
+  UUID id;
+  //int id;
   //int type;
   String typeName;
   String name;
@@ -39,7 +41,8 @@ class BPVariable {
   public BPVariable(JSONObject jvar) {
     this();
     
-    this.id = ((Long)jvar.get("id")).intValue();
+    //this.id = ((Long)jvar.get("id")).intValue();
+    this.id = UUID.fromString((String)jvar.get("id"));
     //this.type = ((Long)jvar.get("type")).intValue();
     this.typeName = (String) jvar.get("typeName");
     this.name = (String) jvar.get("name");
