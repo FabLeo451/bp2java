@@ -170,6 +170,11 @@ public class Blueprint {
       JSONObject jvar = (JSONObject) jVarArray.get(i);
 
       BPVariable v = new BPVariable(jvar);
+
+      // Ignore globals
+      if (v.isGlobal())
+        continue;
+
       variables.add(v);
       
       //System.out.println(v.getTypeName() + " " + v.getName() + " " + v.getValue());

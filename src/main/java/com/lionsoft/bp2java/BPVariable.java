@@ -14,6 +14,8 @@ class BPVariable {
   //int type;
   String typeName;
   String name;
+  boolean global = false;
+  int referenced = 0;
   Object value; // Initial value
   String valueStr; 
   int dimensions;
@@ -47,6 +49,10 @@ class BPVariable {
     this.typeName = (String) jvar.get("typeName");
     this.name = (String) jvar.get("name");
     this.value = (Object) jvar.get("value");
+
+    this.global = jvar.containsKey("global") ? (Boolean) jvar.get("global") : false;
+    this.referenced = jvar.containsKey("referenced") ? ((Long)jvar.get("referenced")).intValue() : 0;
+
 /*      
     switch (this.type) {
       case BPConnector.INT:
@@ -110,6 +116,10 @@ class BPVariable {
   
   public int getDimensions() {
     return (dimensions);
+  }
+
+  public boolean isGlobal() {
+    return global;
   }
 
 };
