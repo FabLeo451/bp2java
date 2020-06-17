@@ -27,13 +27,14 @@ public class Blueprint {
   
   private String id;
   private String name, method;
-  private int type;
+  private BlueprintType type;
   
   Map<Integer, String> types;   // Deprecated
   Map<String, BPType> mapTypes; // Type name is the key
   
   BPEntryPoint entryPointNode;
   BPReturn returnNode;
+  Map<EventType, BPEvent> eventNodes;
   List<BPNode> nodes;
   List<BPVariable> variables;
   List<String> importList;
@@ -46,6 +47,7 @@ public class Blueprint {
  
   public Blueprint() {
     nodes = new ArrayList<BPNode>();
+    eventNodes = new HashMap<EventType, BPEvent>();
     variables = new ArrayList<BPVariable>();
     importList = new ArrayList<String>();
     jarList = new ArrayList<String>();
@@ -102,7 +104,7 @@ public class Blueprint {
     return (name);
   }
   
-  public int getType() {
+  public BlueprintType getType() {
     return (type);
   }
   
@@ -135,7 +137,8 @@ public class Blueprint {
     
     id = (String) jbp.get("id");
     name = (String) jbp.get("name");
-    type = ((Long) jbp.get("type")).intValue();
+    //type = ((Long) jbp.get("type")).intValue();
+    type = BlueprintType.valueOf((String) jbp.get("type"));
     method = jbp.containsKey("method") ? (String) jbp.get("method") : name.replace(" ", "_");
     
     // Types: convert json array into <1,Integer> <2;FLoat> ecc...
@@ -353,7 +356,7 @@ public class Blueprint {
   }
   
   public String toJavaCode() {
-    String functionCode, scope, returnType, header, parameters = "", body;
+    String functionCode, scope, returnType, header, parameters = "", body = "";
     
     //scope = (getType() == Blueprint.MAIN) ? "public static" : "public";
     scope = "public static";
@@ -393,8 +396,9 @@ public class Blueprint {
       System.out.println(nodes.get(i).getCode());
     }*/
     
+
     body = entryPointNode.compile();
-    
+
     functionCode = header + " {" + System.lineSeparator() +
                    declareSection + System.lineSeparator() +
                    body + System.lineSeparator() +

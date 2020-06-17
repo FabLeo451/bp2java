@@ -19,6 +19,7 @@ abstract class BPNode {
   public final static int EXIT = 10;
   public final static int SWITCH_INTEGER = 12;
   public final static int WHILE_LOOP = 13;
+  public final static int EVENT = 14;
 
   int id;
   int type;

@@ -144,7 +144,23 @@ public class {className} {
     if (context == null)
       context = new BPContext();
   }
-   
+/*  
+  public static void _event(EventType event) {
+    switch(event) {
+      case EventType.BEGIN:
+        break;
+        
+      case EventType.EXCEPTION:
+        break;
+        
+      case EventType.END:
+        break;        
+        
+      default:
+        break;
+    }
+  }
+*/   
   /**
    * _initLog()
    */
