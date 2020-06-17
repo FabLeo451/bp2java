@@ -24,7 +24,7 @@ public class {className} {
   static Logger logger = Logger.getLogger({className}.class.getName());
   static BPContext context = null;
   
-  // GLobals section
+  // Global section
   {globals}
   
   public {className}(BPContext c) {

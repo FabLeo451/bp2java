@@ -172,18 +172,16 @@ public class Blueprint {
       BPVariable v = new BPVariable(jvar);
 
       // Ignore globals
-      if (v.isGlobal())
-        continue;
+      if (v.isGlobal()) {
+        //System.out.println("Adding global "+v.toString());
+        program.addGlobal(v);
+      } else {
+        variables.add(v);
 
-      variables.add(v);
-      
-      //System.out.println(v.getTypeName() + " " + v.getName() + " " + v.getValue());
-      //System.out.println(mapTypes.get(v.getTypeName()).toString());
-      
-      declareSection += v.getTypeName() + " " + 
-                        v.getName() + " = " + 
-                        (v.getValue() != null ? v.getValueStr() : mapTypes.get(v.getTypeName()).getInitString()) + ";" + 
-                        System.lineSeparator();
+        declareSection += v.getDeclaration() + " = " + 
+                          (v.getValue() != null ? v.getValueStr() : mapTypes.get(v.getTypeName()).getInitString()) + ";" + 
+                          System.lineSeparator();
+      }
     }
         
     // Nodes

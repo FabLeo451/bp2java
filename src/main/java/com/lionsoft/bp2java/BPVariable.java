@@ -90,6 +90,10 @@ class BPVariable {
     }   
   }
   
+  public String toString() {
+    return "Variable [id=" + id.toString() + ", name=" + name + ", type=" + typeName + "]";
+  }
+    
   public void setValue(Object v) {
     value = v;
   }
@@ -120,6 +124,10 @@ class BPVariable {
 
   public boolean isGlobal() {
     return global;
+  }
+
+  public String getDeclaration() {
+    return typeName + (dimensions == 0 ? "" : (dimensions == 1 ? "[]" : "[][]" ))+" " + name;
   }
 
 };

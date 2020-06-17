@@ -24,6 +24,7 @@ public class BPProgram {
   private List<String> importList;
   public List<String> jarList;
   private List<Blueprint> blueprintList;
+  private Map<String, BPVariable> globals;
   
   private String name;
   private String manifest;
@@ -34,6 +35,7 @@ public class BPProgram {
     importList = new ArrayList<String>();
     jarList = new ArrayList<String>();
     blueprintList = new ArrayList<Blueprint>();
+    globals = new HashMap<String, BPVariable>();
     name = "Program";
     manifest = null;
     code = "";
@@ -73,6 +75,12 @@ public class BPProgram {
     return true;
   }
 
+  public void addGlobal (BPVariable v) {
+    if (!globals.containsKey(v.getName())) {
+      globals.put(v.getName(), v);
+    }
+  }
+
   public void importPackage (String p) {
     for (String s : importList) {
       if (s.equals(p))
@@ -87,7 +95,7 @@ public class BPProgram {
   }
 
   public String toJavaCode () {
-    String template = "", importSection = "", globals = "";
+    String template = "", importSection = "", globalSection = "";
     
     // Load template
     
@@ -115,15 +123,21 @@ public class BPProgram {
         jarList.add(b.jarList.get(k));
     }
      
+    // Import section
     for (int i = 0; i < importList.size(); i++) {
       importSection += "import "+importList.get(i)+";" + System.lineSeparator();
+    }
+     
+    // Global section
+    for (Map.Entry<String, BPVariable> entry : globals.entrySet()) {
+      globalSection += "static "+entry.getValue().getDeclaration()+";" + System.lineSeparator();
     }
     
     //System.out.println("Updating template...");
     
     template = template
                .replace("{import}", importSection)
-               .replace("{globals}", globals)
+               .replace("{globals}", globalSection)
                .replace("{className}", "Program")
                .replace("{programName}", getName())
                .replace("{code}", code);
