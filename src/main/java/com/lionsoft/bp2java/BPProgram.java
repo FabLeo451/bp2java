@@ -19,6 +19,8 @@ import java.util.Iterator;
 import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
 
+//import com.lionsoft.bp2java.BlueprintType;
+
 public class BPProgram {
 
   private List<String> importList;
@@ -62,16 +64,43 @@ public class BPProgram {
   }
 
   public boolean addBlueprint (String filename) {
-    Blueprint b = new Blueprint ();
-    b.setProgram(this);
+    JSONObject jbp;
+    JSONParser jsonParser = new JSONParser();
+    BlueprintType type;
     
-    if (b.load(filename) != Blueprint.SUCCESS) {
-      System.err.println("Error loading blueprint "+filename);
-      return false;
+    //System.out.println("Loading "+filename);
+    // https://crunchify.com/how-to-read-json-object-from-file-in-java/
+    try {
+      FileReader reader = new FileReader(filename);
+      
+      jbp = (JSONObject) jsonParser.parse(reader);
+      type = BlueprintType.valueOf((String) jbp.get("type"));
+
+    } catch (FileNotFoundException e) {
+        e.printStackTrace();
+        return false;
+    } catch (IOException e) {
+        e.printStackTrace();
+        return false;
+    } catch (ParseException e) {
+        e.printStackTrace();
+        return false;
+    }
+    
+    switch (type) {
+      case EVENTS:
+        Blueprint be = new BlueprintEvents (jbp);
+        be.setProgram(this);
+        blueprintList.add((Blueprint) be);
+        break;
+        
+      default:
+        Blueprint b = new Blueprint (jbp);
+        b.setProgram(this);
+        blueprintList.add(b);
+        break;
     }
 
-    blueprintList.add(b);
-    
     return true;
   }
 

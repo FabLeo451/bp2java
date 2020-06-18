@@ -13,10 +13,11 @@ import org.json.simple.parser.ParseException;
 import java.util.Iterator;
 
 public class Blueprint {
-
+/*
   public final static int GENERIC = 0;
   public final static int MAIN = 1;
-  
+  public final static int EVENTS = 2;
+*/  
   public final static int SUCCESS = 0;
   public final static int ERR_FILE_NOT_FOUND = 1;
   public final static int ERR_IO = 2;
@@ -25,9 +26,9 @@ public class Blueprint {
 
   JSONObject jbp;
   
-  private String id;
-  private String name, method;
-  private BlueprintType type;
+  protected String id;
+  protected String name, method;
+  protected BlueprintType type;
   
   Map<Integer, String> types;   // Deprecated
   Map<String, BPType> mapTypes; // Type name is the key
@@ -41,9 +42,9 @@ public class Blueprint {
   List<String> jarList;
   List<String> locals;
   
-  private BPProgram program;
+  protected BPProgram program;
   
-  private String declareSection;
+  protected String declareSection;
  
   public Blueprint() {
     nodes = new ArrayList<BPNode>();
@@ -71,15 +72,15 @@ public class Blueprint {
     mapTypes.put("String", new BPType(3, "String", null));
     mapTypes.put("Boolean", new BPType(4, "Boolean", null));
   }
-/* 
-  public Blueprint(String filename) {
+
+  public Blueprint(JSONObject jo) {
     this();
     
-    int result = load (filename);
+    int result = createFromJson(jo);
     
     if (result != SUCCESS)
       System.out.println("Error "+result);
-  }*/
+  }
   
   public BPConnector getConnectorById(int id) {
     BPNode n;
@@ -111,30 +112,8 @@ public class Blueprint {
   public String getMethodName() {
     return (method);
   }
-  
-  // https://crunchify.com/how-to-read-json-object-from-file-in-java/
-  public int load(String filename) {
-    JSONParser jsonParser = new JSONParser();
-    
-    //System.out.println("Loading "+filename);
-     
-    try {
-      FileReader reader = new FileReader(filename);
-      
-      jbp = (JSONObject) jsonParser.parse(reader);
 
-
-    } catch (FileNotFoundException e) {
-        e.printStackTrace();
-        return ERR_FILE_NOT_FOUND;
-    } catch (IOException e) {
-        e.printStackTrace();
-        return ERR_IO;
-    } catch (ParseException e) {
-        e.printStackTrace();
-        return ERR_JSON_PARSING;
-    }
-    
+  public int createFromJson(JSONObject jbp) {
     id = (String) jbp.get("id");
     name = (String) jbp.get("name");
     //type = ((Long) jbp.get("type")).intValue();
