@@ -39,12 +39,12 @@ public class BlueprintEvents extends Blueprint {
     
     scope = "public static";
     returnType = "void";
-    parameters = "BPEventType event";
+    parameters = "EventType event";
     header = scope + " " + returnType + " " + getMethodName() + "("+parameters+") throws ExitException ";
 
-		body = "if (event == BPEventType.BEGIN) {"+ System.lineSeparator() +
-           "} else if (event == BPEventType.EXCEPTION) {"+ System.lineSeparator() +
-           "} else if (event == BPEventType.END) {"+ System.lineSeparator() +
+		body = "if (event == EventType.BEGIN) {"+ System.lineSeparator() +
+           "} else if (event == EventType.EXCEPTION) {"+ System.lineSeparator() +
+           "} else if (event == EventType.END) {"+ System.lineSeparator() +
            "} else { }"+ System.lineSeparator();
 
 /*
