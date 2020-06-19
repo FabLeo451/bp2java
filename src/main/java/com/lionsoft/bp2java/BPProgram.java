@@ -89,9 +89,14 @@ public class BPProgram {
     
     switch (type) {
       case EVENTS:
-        Blueprint be = new BlueprintEvents (jbp);
+        BlueprintEvents be = new BlueprintEvents (jbp);
         be.setProgram(this);
-        blueprintList.add((Blueprint) be);
+        blueprintList.add(be);
+
+        for (BPNode n: be.getNodes()) {
+          if (n.getType() == BPNode.EVENT)
+            be.addEventNode((BPEvent) n);
+        }
         break;
         
       default:

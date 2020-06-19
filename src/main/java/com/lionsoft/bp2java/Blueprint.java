@@ -35,7 +35,6 @@ public class Blueprint {
   
   BPEntryPoint entryPointNode;
   BPReturn returnNode;
-  Map<EventType, BPEvent> eventNodes;
   List<BPNode> nodes;
   List<BPVariable> variables;
   List<String> importList;
@@ -48,7 +47,6 @@ public class Blueprint {
  
   public Blueprint() {
     nodes = new ArrayList<BPNode>();
-    eventNodes = new HashMap<EventType, BPEvent>();
     variables = new ArrayList<BPVariable>();
     importList = new ArrayList<String>();
     jarList = new ArrayList<String>();
@@ -111,6 +109,10 @@ public class Blueprint {
   
   public String getMethodName() {
     return (method);
+  }
+  
+  public List<BPNode> getNodes() {
+    return (nodes);
   }
 
   public int createFromJson(JSONObject jbp) {
@@ -285,6 +287,12 @@ public class Blueprint {
           
         case BPNode.EXIT:
           nodes.add(new BPExit(jnode));
+          break;
+          
+        case BPNode.EVENT:
+          BPEvent event = new BPEvent(jnode);
+          nodes.add(event);
+          //eventNodes.put(EventType.values()[event.getType()], event);
           break;
           
         default:

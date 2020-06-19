@@ -14,6 +14,8 @@ import java.util.Iterator;
 
 public class BlueprintEvents extends Blueprint {
 
+  protected Map<EventType, BPEvent> eventNodes = new HashMap<EventType, BPEvent>();
+
   public BlueprintEvents() {
     super();
     type = BlueprintType.EVENTS;
@@ -23,51 +25,34 @@ public class BlueprintEvents extends Blueprint {
     super(jo);
   }
 
+  public void addEventNode(BPEvent node) {
+    eventNodes.put(node.getEvent(), node);
+  }
+
+  public Map<EventType, BPEvent> getEventNodes() {
+    return(eventNodes);
+  }
+
   // Overrides
   public String toJavaCode() {
     String functionCode, scope, returnType, header, parameters = "", body = "";
     
-    //scope = (getType() == Blueprint.MAIN) ? "public static" : "public";
     scope = "public static";
-    //returnType = returnNode.returnsValue() ? /*BPConnector.typeToString(returnNode.getReturnType())*/ (String) types.get(returnNode.getReturnType()) : "void";
-    returnType = returnNode.returnsValue() ? returnNode.getReturnTypeName() : "void";
-    
-    //System.out.println("nIn = "+entryPointNode.getInputParamsCount());
-    for (int i=1; i<entryPointNode.getOutputParamsCount(); i++) {
-      if (i > 1)
-        parameters += ", ";
-        
-      String dim;
-      
-      switch (entryPointNode.getOutputConnector(i).getDimensions()) {
-        case BPVariable.ARRAY:
-          dim = "[]";
-          break;
-          
-        case BPVariable.MATRIX:
-          dim = "[][]";
-          break;
-          
-        default:
-          dim = "";
-          break;
-      }
-        
-      parameters += /*(String) types.get(entryPointNode.getOutputConnector(i).getDataType())*/ entryPointNode.getOutputConnector(i).getDataTypeName() + dim + " " + entryPointNode.getOutputConnector(i).getLabel();
-    }
-    
+    returnType = "void";
+    parameters = "BPEventType event";
     header = scope + " " + returnType + " " + getMethodName() + "("+parameters+") throws ExitException ";
-      
-    for (int k=0; k<locals.size(); k++)
+
+		body = "if (event == BPEventType.BEGIN) {"+ System.lineSeparator() +
+           "} else if (event == BPEventType.EXCEPTION) {"+ System.lineSeparator() +
+           "} else if (event == BPEventType.END) {"+ System.lineSeparator() +
+           "} else { }"+ System.lineSeparator();
+
+/*
+     for (int k=0; k<locals.size(); k++)
       declareSection += locals.get(k) + System.lineSeparator();
-  /*
-    for (int i=0; i<nodes.size(); i++) {
-      System.out.println(nodes.get(i).getCode());
-    }*/
-    
 
     body = entryPointNode.compile();
-
+*/
     functionCode = header + " {" + System.lineSeparator() +
                    declareSection + System.lineSeparator() +
                    body + System.lineSeparator() +
