@@ -174,7 +174,7 @@ public class BPProgram {
                .replace("{globals}", globalSection)
                .replace("{className}", "Program")
                .replace("{programName}", getName())
-               .replace("{code}", code);
+               .replace("{user-functions}", code);
                
     code = template;
 

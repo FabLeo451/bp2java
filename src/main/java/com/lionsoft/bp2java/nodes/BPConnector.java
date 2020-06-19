@@ -100,18 +100,22 @@ class BPConnector {
         JSONObject jref = (JSONObject) java.get("references");
         
         if (jref.containsKey("input")) {
-          // Reference an input variable
+          // Reference an input connector
           references = new Reference(((Long)jref.get("input")).intValue());
         }
         else if (jref.containsKey("variable")) {
-          // Reference a variable
+          // Reference a local variable
           // "references": {"variable":"varName"}
           String arrayAttr = dimensions == 0 ? "" : (dimensions == 1 ? "[]" : "[][]");
-          createReferenceLocalVariable (type.getName() + arrayAttr, (String) java.get("variable"));
+          createReferenceLocalVariable (type.getName() + arrayAttr, (String) jref.get("variable"));
+        }
+        else if (jref.containsKey("object")) {
+          // Reference an object
+          setFixedOutput((String) jref.get("object"));
+          System.out.println(getLabel()+" references "+(String) jref.get("object"));
         }
         else {
-          // Reference a new variable (deprecated)
-          createReferenceLocalVariable (jref);
+          System.out.println("'references' without target object");
         }
         
         //setFixedOutput(varName);

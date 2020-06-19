@@ -13,9 +13,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.DailyRollingFileAppender;
 import java.lang.Exception;
 
-import com.lionsoft.standard.BPContext;
-import com.lionsoft.standard.ExitException;
-import com.lionsoft.jlogic.EventType;
+import com.lionsoft.jlogic.standard.*;
 
 // Import section
 {import}
@@ -106,11 +104,21 @@ public class {className} {
     }
      
     try {
+      _event(EventType.BEGIN, null);
       _main(_argv);
     } catch (ExitException e) {
 
     } catch (Exception e) {
       logger.error(e);
+      
+      try {
+        _event(EventType.EXCEPTION, e.getMessage());
+      } catch (ExitException ex) { }
+    }
+    finally {
+      try {
+        _event(EventType.END, null);
+      } catch (ExitException ex) { }
     }
     //System.exit(resultCode);
   }
@@ -208,9 +216,9 @@ public class {className} {
       
     throw new ExitException(message);
   }
-  
+
   // User code
   
-  {code}
+  {user-functions}
 };
 

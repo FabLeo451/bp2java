@@ -35,16 +35,21 @@ public class BlueprintEvents extends Blueprint {
 
   // Overrides
   public String toJavaCode() {
-    String functionCode, scope, returnType, header, parameters = "", body = "";
+    String functionCode, header, body;
+    String begin="", exception="", end="";
     
-    scope = "public static";
-    returnType = "void";
-    parameters = "EventType event";
-    header = scope + " " + returnType + " " + getMethodName() + "("+parameters+") throws ExitException ";
+    header = "public static void " + getMethodName() + "(EventType event, String message) throws ExitException ";
+
+    begin = eventNodes.get(EventType.BEGIN).compile();
+    exception = eventNodes.get(EventType.EXCEPTION).compile();
+    end = eventNodes.get(EventType.END).compile();
 
 		body = "if (event == EventType.BEGIN) {"+ System.lineSeparator() +
+		       begin +
            "} else if (event == EventType.EXCEPTION) {"+ System.lineSeparator() +
+           exception +
            "} else if (event == EventType.END) {"+ System.lineSeparator() +
+           end +
            "} else { }"+ System.lineSeparator();
 
 /*
