@@ -89,8 +89,8 @@ public class BPProgram {
     
     switch (type) {
       case EVENTS:
-        BlueprintEvents be = new BlueprintEvents (jbp);
-        be.setProgram(this);
+        BlueprintEvents be = new BlueprintEvents (this, jbp);
+        //be.setProgram(this);
         blueprintList.add(be);
 
         for (BPNode n: be.getNodes()) {
@@ -100,8 +100,8 @@ public class BPProgram {
         break;
         
       default:
-        Blueprint b = new Blueprint (jbp);
-        b.setProgram(this);
+        Blueprint b = new Blueprint (this, jbp);
+        //b.setProgram(this);
         blueprintList.add(b);
         break;
     }

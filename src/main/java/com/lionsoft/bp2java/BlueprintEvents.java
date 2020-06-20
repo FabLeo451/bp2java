@@ -21,8 +21,8 @@ public class BlueprintEvents extends Blueprint {
     type = BlueprintType.EVENTS;
   }
 
-  public BlueprintEvents(JSONObject jo) {
-    super(jo);
+  public BlueprintEvents(BPProgram program, JSONObject jo) {
+    super(program, jo);
   }
 
   public void addEventNode(BPEvent node) {

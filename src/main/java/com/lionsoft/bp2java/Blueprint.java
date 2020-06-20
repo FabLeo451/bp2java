@@ -71,9 +71,9 @@ public class Blueprint {
     mapTypes.put("Boolean", new BPType(4, "Boolean", null));
   }
 
-  public Blueprint(JSONObject jo) {
+  public Blueprint(BPProgram program, JSONObject jo) {
     this();
-    
+    this.program = program;
     int result = createFromJson(jo);
     
     if (result != SUCCESS)
