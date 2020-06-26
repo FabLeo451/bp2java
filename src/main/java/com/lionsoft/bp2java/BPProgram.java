@@ -27,12 +27,13 @@ public class BPProgram {
   public List<String> jarList;
   private List<Blueprint> blueprintList;
   private Map<String, BPVariable> globals;
-  
+
+  private String rootDir = ".";
   private String name;
   private String manifest;
   private String code;
   private String importSection;
- 
+
   public BPProgram() {
     importList = new ArrayList<String>();
     jarList = new ArrayList<String>();
@@ -42,23 +43,31 @@ public class BPProgram {
     manifest = null;
     code = "";
   }
-  
+
+  public void setRootDir(String d) {
+    this.rootDir = d;
+  }
+
+  public String getRootDir() {
+    return (this.rootDir);
+  }
+
   public void setName(String name) {
     this.name = name;
   }
-  
+
   public String getName() {
     return (this.name);
   }
-  
+
   public void setManifest(String manifest) {
     this.manifest = manifest;
   }
-  
+
   public String getManifest() {
     return (this.manifest);
   }
-  
+
   public List<Blueprint> getBlueprintList() {
     return (blueprintList);
   }
@@ -67,12 +76,12 @@ public class BPProgram {
     JSONObject jbp;
     JSONParser jsonParser = new JSONParser();
     BlueprintType type;
-    
+
     //System.out.println("Loading "+filename);
     // https://crunchify.com/how-to-read-json-object-from-file-in-java/
     try {
       FileReader reader = new FileReader(filename);
-      
+
       jbp = (JSONObject) jsonParser.parse(reader);
       type = BlueprintType.valueOf((String) jbp.get("type"));
 
@@ -86,7 +95,7 @@ public class BPProgram {
         e.printStackTrace();
         return false;
     }
-    
+
     switch (type) {
       case EVENTS:
         BlueprintEvents be = new BlueprintEvents (this, jbp);
@@ -98,7 +107,7 @@ public class BPProgram {
             be.addEventNode((BPEvent) n);
         }
         break;
-        
+
       default:
         Blueprint b = new Blueprint (this, jbp);
         //b.setProgram(this);
@@ -120,19 +129,19 @@ public class BPProgram {
       if (s.equals(p))
         return;
     }
-            
+
     importList.add (p);
   }
-  
+
   public String getJavaCode() {
     return (code);
   }
 
   public String toJavaCode () {
-    String template = "", importSection = "", globalSection = "";
-    
+    String template = "", importSection = "", globalSection = "", includeSection = "";
+
     // Load template
-    
+
     try {
       InputStream inputStream = getClass().getResourceAsStream("/templates/template.java");
       BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -140,59 +149,62 @@ public class BPProgram {
     } catch (Exception e) {
       e.printStackTrace();
     }
-  
+
     //code += "public class "+getName()+" {" + System.lineSeparator();
-    
+
     for (int i = 0; i < blueprintList.size(); i++) {
       //System.out.println("Blueprint "+blueprintList.get(i).getName());
-      
+
       Blueprint b = blueprintList.get(i);
-      
+
       code += b.toJavaCode();
-      
+
       for (int k=0; k<b.importList.size(); k++)
         importList.add(b.importList.get(k));
-      
+
       for (int k=0; k<b.jarList.size(); k++)
         jarList.add(b.jarList.get(k));
+
+      // Include section
+      includeSection += b.getIncludedJava();
     }
-     
+
     // Import section
     for (int i = 0; i < importList.size(); i++) {
       importSection += "import "+importList.get(i)+";" + System.lineSeparator();
     }
-     
+
     // Global section
     for (Map.Entry<String, BPVariable> entry : globals.entrySet()) {
-      globalSection += "static "+entry.getValue().getDeclaration()+";" + System.lineSeparator();
+     globalSection += "static "+entry.getValue().getDeclaration()+";" + System.lineSeparator();
     }
-    
+
     //System.out.println("Updating template...");
-    
+
     template = template
                .replace("{import}", importSection)
                .replace("{globals}", globalSection)
+               .replace("{include}", includeSection)
                .replace("{className}", "Program")
                .replace("{programName}", getName())
                .replace("{user-functions}", code);
-               
+
     code = template;
 
     return code;
   }
-  
+
   public boolean format() {
     //System.out.println("Formatting...");
-    
+
     try {
       code = new Formatter().formatSource(code);
-    } 
+    }
     catch (FormatterException e) {
       System.err.println(e.getMessage());
       return false;
     }
-    
+
     return true;
   }
 };
-

@@ -22,10 +22,13 @@ public class {className} {
 
   static Logger logger = Logger.getLogger({className}.class.getName());
   static BPContext context = null;
-  
+
   // Global section
   {globals}
-  
+
+  // Include section
+  {include}
+
   public {className}(BPContext c) {
     _init();
     context = c;
@@ -34,7 +37,7 @@ public class {className} {
 
   public static void main(String[] argv) {
     int resultCode = 0;
-    
+
     _init();
 
     int c;
@@ -83,26 +86,26 @@ public class {className} {
         case '?':
           System.out.println("The option '" + (char)g.getOptopt() + "' is not valid");
           break;
-          
+
         default:
           System.out.println("getopt() returned " + c);
           break;
        }
      }
- 
+
      //System.out.println("argv.length = " + argv.length + "\n");
      //System.out.println("g.getOptind() = " + g.getOptind() + "\n");
-     
+
     int k=0, n = argv.length - g.getOptind();
     String[] _argv = null;
-     
+
     if (n > 0) {
      _argv = new String[n];
-     
+
      for (int i = g.getOptind(); i < argv.length ; i++)
        _argv[k++] = argv[i];
     }
-     
+
     try {
       _event(EventType.BEGIN, null);
       _main(_argv);
@@ -110,7 +113,7 @@ public class {className} {
 
     } catch (Exception e) {
       logger.error(e);
-      
+
       try {
         _event(EventType.EXCEPTION, e.getMessage());
       } catch (ExitException ex) { }
@@ -122,11 +125,11 @@ public class {className} {
     }
     //System.exit(resultCode);
   }
-  
+
   public static BPContext _getContext() {
     return (context);
   }
-  
+
   /**
    * _help()
    */
@@ -142,25 +145,25 @@ public class {className} {
                        "  -L, --logpath    Set log path." + System.lineSeparator() +
                        System.lineSeparator());
   }
-  
+
   /**
    * _init()
    */
   public static void _init() {
     BasicConfigurator.configure();
     logger.setLevel(Level.INFO);
-    
+
     if (context == null)
       context = new BPContext();
   }
-   
+
   /**
    * _initLog()
    */
   public static void _initLog() {
     // https://examples.javacodegeeks.com/enterprise-java/log4j/log4j-rolling-daily-file-example/
     //DailyRollingFileAppender appender = new DailyRollingFileAppender(layout, context.getLogPath()+"test.log", "'.'yyyy-MM-dd");
-    
+
     PatternLayout patternLayoutObj = new PatternLayout();
     //String conversionPattern = "[%p] %d %c %M - %m%n";
     String conversionPattern = "%d [%p] [%t] %m%n";
@@ -172,7 +175,7 @@ public class {className} {
     rollingAppenderObj.setDatePattern("'.'yyyy-MM-dd");
     rollingAppenderObj.setLayout(patternLayoutObj);
     rollingAppenderObj.activateOptions();
-    
+
     //logger.info("Log: "+context.getLogPath()+"/{programName}.log");
 
     // Configure the Root Logger
@@ -184,41 +187,40 @@ public class {className} {
     while (allLoggers.hasMoreElements()) {
       Logger l = allLoggers.nextElement();
       //System.out.println("Logger: "+l.getName());
-       
+
       Enumeration<Appender> allAppenders = l.getAllAppenders();
       while (allAppenders.hasMoreElements()) {
         Appender a = allAppenders.nextElement();
         //System.out.println("Appender: "+a.getName());
         logger.removeAppender(a);
-      } 
+      }
     }
 
     logger.addAppender(rollingAppenderObj);
   }
-   
+
   public static void _log(String s) {
     logger.info(s);
   }
-   
+
   public static void _error(String s) {
     logger.error(s);
   }
-   
+
   public static int _getCode() {
     return(context.getCode());
   }
-   
+
   public static void _exit(int code, String message) throws ExitException {
     if (context != null)
       context.setResult(code, message);
-      
+
     System.err.println(message+" (code: "+code+")");
-      
+
     throw new ExitException(message);
   }
 
   // User code
-  
+
   {user-functions}
 };
-

@@ -23,6 +23,8 @@ public class BlueprintCompiler {
     
     BPProgram program = new BPProgram();
 
+    System.out.println("Current direcotry: "+System.getProperty("user.dir"));	
+	  
     int c;
     LongOpt[] longopts = new LongOpt[7];
 
@@ -31,11 +33,11 @@ public class BlueprintCompiler {
     longopts[2] = new LongOpt("output", LongOpt.REQUIRED_ARGUMENT, null, 'O'); 
     longopts[3] = new LongOpt("program", LongOpt.REQUIRED_ARGUMENT, null, 'P'); 
     longopts[4] = new LongOpt("manifest", LongOpt.REQUIRED_ARGUMENT, null, 'm'); 
-    longopts[5] = new LongOpt("deps", LongOpt.REQUIRED_ARGUMENT, null, 'd'); 
+    longopts[5] = new LongOpt("root", LongOpt.REQUIRED_ARGUMENT, null, 'r'); 
     longopts[6] = new LongOpt("format", LongOpt.NO_ARGUMENT, null, 'f'); 
     //longopts[2] = new LongOpt("maximum", LongOpt.OPTIONAL_ARGUMENT, null, 2);
 
-    Getopt g = new Getopt("bpcompiler", argv, "b:P:m:d:O:h", longopts);
+    Getopt g = new Getopt("bp2java", argv, "b:P:m:O:r:h", longopts);
     g.setOpterr(false); // We'll do our own error handling
 
     while ((c = g.getopt()) != -1)
@@ -68,8 +70,8 @@ public class BlueprintCompiler {
           program.setManifest(g.getOptarg());
           break;
           
-        case 'd':
-          depFile = g.getOptarg();
+        case 'r':
+          program.setRootDir(g.getOptarg());
           break;
           
         case 'f':
