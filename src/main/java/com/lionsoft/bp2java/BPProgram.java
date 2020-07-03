@@ -185,9 +185,9 @@ public class BPProgram {
                .replace("{import}", importSection)
                .replace("{globals}", globalSection)
                .replace("{include}", includeSection)
+               .replace("{user-functions}", code)
                .replace("{className}", "Program")
-               .replace("{programName}", getName())
-               .replace("{user-functions}", code);
+               .replace("{programName}", getName());
 
     code = template;
 
