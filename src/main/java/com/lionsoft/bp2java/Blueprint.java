@@ -411,6 +411,7 @@ public class Blueprint {
     functionCode = header + " {" + System.lineSeparator() +
                    declareSection + System.lineSeparator() +
                    body + System.lineSeparator() +
+                   (returnNode.returnsValue() ? returnNode.getCode(): "") +
                    "}" + System.lineSeparator();
 
     return functionCode;
