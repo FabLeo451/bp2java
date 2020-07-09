@@ -408,7 +408,8 @@ public class Blueprint {
 
     body = entryPointNode.compile();
 
-    functionCode = header + " {" + System.lineSeparator() +
+    functionCode = "@Blueprint(id=\""+id+"\", name=\""+name+"\", type=\""+type+"\")" +
+                   header + " {" + System.lineSeparator() +
                    declareSection + System.lineSeparator() +
                    body + System.lineSeparator() +
                    (returnNode.returnsValue() ? returnNode.getCode(): "") +
