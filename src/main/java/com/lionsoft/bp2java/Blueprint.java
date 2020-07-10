@@ -393,7 +393,7 @@ public class Blueprint {
           break;
       }
 
-      parameters += /*(String) types.get(entryPointNode.getOutputConnector(i).getDataType())*/ entryPointNode.getOutputConnector(i).getDataTypeName() + dim + " " + entryPointNode.getOutputConnector(i).getLabel();
+      parameters += "@BPConnector(id="+entryPointNode.getOutputConnector(i).getId()+")" + entryPointNode.getOutputConnector(i).getDataTypeName() + dim + " " + entryPointNode.getOutputConnector(i).getLabel();
     }
 
     header = scope + " " + returnType + " " + getMethodName() + "("+parameters+") throws ExitException ";
@@ -409,10 +409,14 @@ public class Blueprint {
     body = entryPointNode.compile();
 
     functionCode = "@Blueprint(id=\""+id+"\", name=\""+name+"\", type=\""+type+"\")" +
+                   (returnNode.returnsValue() ?
+                      "@BPConnector(id="+returnNode.getInputConnector(1).getId()+", "+
+                                   "label=\""+returnNode.getInputConnector(1).getLabel()+"\")" :
+                      "") +
                    header + " {" + System.lineSeparator() +
                    declareSection + System.lineSeparator() +
                    body + System.lineSeparator() +
-                   (returnNode.returnsValue() ? returnNode.getCode(): "") +
+                   //(returnNode.returnsValue() ? returnNode.getCode(): "") +
                    "}" + System.lineSeparator();
 
     return functionCode;
