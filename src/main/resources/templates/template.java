@@ -21,7 +21,7 @@ import com.lionsoft.jlogic.standard.*;
 public class {className} {
 
   static Logger logger = Logger.getLogger({className}.class.getName());
-  static BPContext context = null;
+  static BPContext context = new BPContext();
 
   // Global section
   {globals}
