@@ -1,5 +1,5 @@
 
-import java.util.Enumeration;
+import java.util.*;
 
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
