@@ -29,6 +29,7 @@ public class Blueprint {
   JSONObject jbp;
 
   protected String id;
+  protected Integer internalId;
   protected String name, method;
   protected BlueprintType type;
 
@@ -102,6 +103,10 @@ public class Blueprint {
     return (id);
   }
 
+  public String getInternalId() {
+    return (id);
+  }
+
   public String getName() {
     return (name);
   }
@@ -120,6 +125,7 @@ public class Blueprint {
 
   public int createFromJson(JSONObject jbp) {
     id = (String) jbp.get("id");
+    internalId = (Integer) ((Long) jbp.get("internalId")).intValue();
     name = (String) jbp.get("name");
     //type = ((Long) jbp.get("type")).intValue();
     type = BlueprintType.valueOf((String) jbp.get("type"));
@@ -408,7 +414,7 @@ public class Blueprint {
 
     body = entryPointNode.compile();
 
-    functionCode = "@Blueprint(id=\""+id+"\", name=\""+name+"\", type=\""+type+"\")" +
+    functionCode = "@Blueprint(id=\""+id+"\", internalId="+internalId+", name=\""+name+"\", type=\""+type+"\")" +
                    (returnNode.returnsValue() ?
                       "@BPConnector(id="+returnNode.getInputConnector(1).getId()+", "+
                                    "label=\""+returnNode.getInputConnector(1).getLabel()+"\")" :
