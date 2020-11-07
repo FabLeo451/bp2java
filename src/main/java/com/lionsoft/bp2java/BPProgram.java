@@ -33,6 +33,7 @@ public class BPProgram {
   private String manifest;
   private String code;
   private String importSection;
+  private String globalSection = "";
 
   public BPProgram() {
     importList = new ArrayList<String>();
@@ -124,6 +125,11 @@ public class BPProgram {
     }
   }
 
+  public void appendToGlobals (String s) {
+    if (!globalSection.contains(s))
+      globalSection += s;
+  }
+
   public void importPackage (String p) {
     for (String s : importList) {
       if (s.equals(p))
@@ -138,7 +144,7 @@ public class BPProgram {
   }
 
   public String toJavaCode () {
-    String template = "", importSection = "", globalSection = "", includeSection = "";
+    String template = "", importSection = "", /*globalSection = "", */ includeSection = "";
 
     // Load template
 

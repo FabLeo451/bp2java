@@ -32,6 +32,7 @@ abstract class BPNode {
 
   String java = "";
   String nodePath = ".";
+  String declare = null;
 
   List<BPConnector> input;
   List<BPConnector> output;
@@ -143,6 +144,10 @@ abstract class BPNode {
     return (java);
   }
 
+  public String getDeclare () {
+    return (declare);
+  }
+
   public void getSubsequentCode () {
     for (int i=0; i<nOut; i++) {
       BPConnector c = getOutputConnector(i);
@@ -184,6 +189,10 @@ abstract class BPNode {
     if (jn.containsKey("data")) {
       JSONObject jdata = (JSONObject) jn.get("data");
       nodePath = jdata.containsKey("path") ? (String) jdata.get("path") : ".";
+    }
+
+    if (jn.containsKey("declare")) {
+      declare = ((String) jn.get("declare")).replace("{node.id}", Integer.toString(id));
     }
 
     if (jn.containsKey("options")) {

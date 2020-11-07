@@ -326,6 +326,9 @@ public class Blueprint {
             System.err.println("Can't include "+filename+": "+e.getMessage());
           }
         }
+        
+        if (node.getDeclare() != null)
+          program.appendToGlobals(node.getDeclare() + System.lineSeparator());
       }
     }
 
