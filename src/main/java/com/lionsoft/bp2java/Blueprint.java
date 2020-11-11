@@ -391,7 +391,8 @@ public class Blueprint {
     //scope = (getType() == Blueprint.MAIN) ? "public static" : "public";
     scope = "public static";
     //returnType = returnNode.returnsValue() ? /*BPConnector.typeToString(returnNode.getReturnType())*/ (String) types.get(returnNode.getReturnType()) : "void";
-    returnType = returnNode.returnsValue() ? returnNode.getReturnTypeName() : "void";
+    returnType = (returnNode.returnsValue() ? returnNode.getReturnTypeName() : "void") +
+                 (returnNode.getReturnArray() == 1 ? "[]" : "");
 
     //System.out.println("nIn = "+entryPointNode.getInputParamsCount());
     for (int i=1; i<entryPointNode.getOutputParamsCount(); i++) {

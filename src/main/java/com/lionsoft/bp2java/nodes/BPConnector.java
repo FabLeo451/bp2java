@@ -109,11 +109,12 @@ class BPConnector {
           // "references": {"variable":"varName"}
           String arrayAttr = dimensions == 0 ? "" : (dimensions == 1 ? "[]" : "[][]");
           createReferenceLocalVariable (type.getName() + arrayAttr, (String) jref.get("variable"));
+          //System.out.println("Referencing "+type.getName() + arrayAttr+" "+(String) jref.get("variable"));
         }
         else if (jref.containsKey("object")) {
           // Reference an object
           setFixedOutput((String) jref.get("object"));
-          System.out.println(getLabel()+" references "+(String) jref.get("object"));
+          //System.out.println(getLabel()+" references "+(String) jref.get("object"));
         }
         else {
           System.out.println("'references' without target object");
@@ -157,6 +158,8 @@ class BPConnector {
 
       }
     }
+    
+    //System.out.println("Created "+this.toString());
   }
 
   public void createReferenceLocalVariable (String decl, String name) {
@@ -165,6 +168,8 @@ class BPConnector {
     varName = "_conn_"+name+"_"+id;
     references = new Reference(decl, varName);
     setFixedOutput(varName);
+    
+    //System.out.println("Local var: "+decl+" "+varName);
   }
 
   public void createReferenceLocalVariable (JSONObject jref) {
@@ -172,7 +177,7 @@ class BPConnector {
   }
 
   public String toString() {
-    return("BPConnector [id="+id+", type="+dataTypeName+", label="+label+"]");
+    return("BPConnector [id="+id+", type="+dataTypeName+", label="+label+", dimensions="+dimensions+"]");
   }
 
   public void setReference(Reference r) {

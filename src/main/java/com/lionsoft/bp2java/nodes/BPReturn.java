@@ -39,6 +39,10 @@ public class BPReturn extends BPNode {
     return (returnTypeName);
   }
   
+  public int getReturnArray() {
+    return (returnDim);
+  }
+  
   public String getCode() {
     String code = "return";
     

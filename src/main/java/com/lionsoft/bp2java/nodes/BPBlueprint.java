@@ -46,9 +46,9 @@ public class BPBlueprint extends BPFunction {
  
     if (returns()) {
       BPConnector returnConn = getOutputConnector(1);
-      System.out.println("BPBlueprint: "+returnConn.toString());
-      returnConn.createReferenceLocalVariable (returnConn.getDataTypeName(), "bp_out");
-      referenceList.add(new Reference(returnConn.getDataTypeName(), returnConn.getFixedOutput()));
+      //System.out.println("BPBlueprint: "+returnConn.toString());
+      returnConn.createReferenceLocalVariable (returnConn.getDataTypeName() + (returnConn.getDimensions() == 0 ? "" : "[]"), "bp_out");
+      referenceList.add(new Reference(returnConn.getDataTypeName() + (returnConn.getDimensions() == 0 ? "" : "[]"), returnConn.getFixedOutput()));
     }
     
     setJava(javaCode);
