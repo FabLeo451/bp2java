@@ -111,6 +111,12 @@ public class BPProgram {
 
       default:
         Blueprint b = new Blueprint (this, jbp);
+
+				if (b.getResult() != Blueprint.SUCCESS) {
+          System.err.println(b.getMessage());
+          return false;
+        }
+
         //b.setProgram(this);
         blueprintList.add(b);
         break;
@@ -159,7 +165,7 @@ public class BPProgram {
     //code += "public class "+getName()+" {" + System.lineSeparator();
 
     for (int i = 0; i < blueprintList.size(); i++) {
-      //System.out.println("Blueprint "+blueprintList.get(i).getName());
+      System.out.println("Blueprint "+blueprintList.get(i).getName());
 
       Blueprint b = blueprintList.get(i);
 
@@ -185,7 +191,7 @@ public class BPProgram {
      globalSection += "static "+entry.getValue().getDeclaration()+";" + System.lineSeparator();
     }
 
-    //System.out.println("Updating template...");
+    System.out.println("Updating template...");
 
     template = template
                .replace("{import}", importSection)

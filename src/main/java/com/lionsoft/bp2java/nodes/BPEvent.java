@@ -15,7 +15,7 @@ public class BPEvent extends BPNode {
   public BPEvent(JSONObject jo) {
     super(jo);
     setType (EVENT);
-    System.out.println("BPEvent "+getName()+" "+(String) jo.get("event"));
+    //System.out.println("BPEvent "+getName()+" "+(String) jo.get("event"));
     event = EventType.valueOf((String) jo.get("event"));
   }
 

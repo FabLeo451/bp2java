@@ -26,11 +26,13 @@ public class Blueprint {
   public final static int ERR_JSON_PARSING = 3;
   public final static int ERR_MUST_CONNECT = 4;
 
+  int result = SUCCESS;
+
   JSONObject jbp;
 
   protected String id;
   protected Integer internalId;
-  protected String name, method;
+  protected String name, method, message;
   protected BlueprintType type;
 
   Map<Integer, String> types;   // Deprecated
@@ -78,10 +80,11 @@ public class Blueprint {
   public Blueprint(BPProgram program, JSONObject jo) {
     this();
     this.program = program;
-    int result = createFromJson(jo);
+    result = createFromJson(jo);
 
-    if (result != SUCCESS)
-      System.out.println("Error "+result);
+    /*if (result != SUCCESS) {
+      System.err.println("Error "+result+" "+message);
+    }*/
   }
 
   public BPConnector getConnectorById(int id) {
@@ -109,6 +112,14 @@ public class Blueprint {
 
   public String getName() {
     return (name);
+  }
+
+  public int getResult() {
+    return (result);
+  }
+
+  public String getMessage() {
+    return (message);
   }
 
   public BlueprintType getType() {
@@ -362,7 +373,8 @@ public class Blueprint {
 
     for (BPNode node : nodes) {
       if (!node.check()) {
-        System.err.println(node.getMessage());
+        //System.err.println(node.getMessage());
+        message = node.getMessage();
         return (ERR_MUST_CONNECT);
       }
 

@@ -8,6 +8,7 @@ public class BPReturn extends BPNode {
   Boolean returnsValueFlag;
   //int returnType;
   String returnTypeName;
+  int returnDim = 0;
  
   public BPReturn() {
     super();
@@ -19,9 +20,11 @@ public class BPReturn extends BPNode {
     super(jo);
     returnsValueFlag = nIn > 1; // Exec is always present
     
-    if (returnsValueFlag)
+    if (returnsValueFlag) {
       //returnType = getInputConnector(1).getDataType();
       returnTypeName = getInputConnector(1).getDataTypeName();
+      returnDim = getInputConnector(1).getDimensions();
+    }
   }
   
   public Boolean returnsValue() {
