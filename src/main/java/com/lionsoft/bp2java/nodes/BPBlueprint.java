@@ -7,6 +7,7 @@ public class BPBlueprint extends BPFunction {
 
   //String method = null;
   String blueprintId = null;
+  int blueprintInternalId = -1;
   private List<Blueprint> blueprintList;
 
   public BPBlueprint() {
@@ -20,6 +21,7 @@ public class BPBlueprint extends BPFunction {
     
     //method = (String) jo.get("method");
     blueprintId = (String) jo.get("blueprintId");
+    blueprintInternalId = ((Long) jo.get("blueprintInternalId")).intValue();
 
     String javaCode = "";
 
@@ -61,10 +63,12 @@ public class BPBlueprint extends BPFunction {
   public String getCode() {
     String source = super.getCode();
     
+    // Search the blueprint to be called by internal id
+    
     for (Blueprint b: blueprintList) {
       //System.out.println(blueprintId+" -> "+b.getId()+" "+b.getMethodName());
       
-      if (b.getId().equals(blueprintId)) {
+      if (b.getInternalId() == blueprintInternalId) {
         source = source.replace("{method}", b.getMethodName());
         break;
       }

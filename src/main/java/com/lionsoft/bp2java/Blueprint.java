@@ -106,8 +106,8 @@ public class Blueprint {
     return (id);
   }
 
-  public String getInternalId() {
-    return (id);
+  public Integer getInternalId() {
+    return (internalId);
   }
 
   public String getName() {
