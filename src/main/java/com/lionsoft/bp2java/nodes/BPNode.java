@@ -54,7 +54,7 @@ abstract class BPNode {
   public BPNode() {
     input = new ArrayList<BPConnector>();
     output = new ArrayList<BPConnector>();
-    importList = new ArrayList<String>();
+    //importList = new ArrayList<String>(); // Now read from blueprint
     jarList = new ArrayList<String>();
     referenceList = new ArrayList<Reference>();
     includeList = new ArrayList<String>();
@@ -221,7 +221,8 @@ abstract class BPNode {
     }
 
     //System.out.println("options.javaInputArray = "+javaInputArray);
-
+/* 
+    // Now read from blueprint
     if (jn.containsKey("import")) {
       JSONArray ja = (JSONArray) jn.get("import");
 
@@ -229,6 +230,7 @@ abstract class BPNode {
         importList.add((String)ja.get(i));
       }
     }
+*/
 
     /*
     // Done by JLogic when compiling
