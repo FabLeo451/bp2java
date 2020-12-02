@@ -142,6 +142,20 @@ public class Blueprint {
     type = BlueprintType.valueOf((String) jbp.get("type"));
     method = jbp.containsKey("method") ? (String) jbp.get("method") : name.replace(" ", "_");
 
+		// Import list
+		if (jbp.containsKey("import")) {
+      JSONArray jImportArray = (JSONArray) jbp.get("import");
+
+      for (int i=0; i < jImportArray.size(); i++) {
+				    String item = (String) jImportArray.get(i);
+
+            if (!importList.contains(item)) {
+              importList.add(item);
+              //System.out.println("Blueprint "+name+" import: "+item);
+            }
+      }
+    }
+
     // Types: convert json array into <1,Integer> <2;FLoat> ecc...
 
     if (jbp.containsKey("types")) {
@@ -234,12 +248,12 @@ public class Blueprint {
         case BPNode.OPERATOR:
           BPOperator o = new BPOperator(jnode);
           nodes.add(o);
-
+/*
           for (int k=0; k<o.importList.size(); k++) {
             if (!importList.contains(o.importList.get(k)))
               importList.add(o.importList.get(k));
           }
-
+*/
           for (int k=0; k<o.jarList.size(); k++) {
             if (!jarList.contains(o.jarList.get(k)))
               jarList.add(o.jarList.get(k));
@@ -256,12 +270,12 @@ public class Blueprint {
           BPFunction f = new BPFunction(jnode);
           nodes.add(f);
           node = (BPNode) f;
-
+/*
           for (int k=0; k<f.importList.size(); k++) {
             if (!importList.contains(f.importList.get(k)))
               importList.add(f.importList.get(k));
           }
-
+*/
           for (int k=0; k<f.jarList.size(); k++) {
             if (!jarList.contains(f.jarList.get(k)))
               jarList.add(f.jarList.get(k));

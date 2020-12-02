@@ -137,12 +137,13 @@ public class BPProgram {
   }
 
   public void importPackage (String p) {
-    for (String s : importList) {
+    /*for (String s : importList) {
       if (s.equals(p))
         return;
-    }
+    }*/
 
-    importList.add (p);
+		if (!importList.contains(p))
+      importList.add (p);
   }
 
   public String getJavaCode() {
@@ -172,7 +173,8 @@ public class BPProgram {
       code += b.toJavaCode();
 
       for (int k=0; k<b.importList.size(); k++)
-        importList.add(b.importList.get(k));
+        //importList.add(b.importList.get(k));
+        importPackage(b.importList.get(k));
 
       for (int k=0; k<b.jarList.size(); k++)
         jarList.add(b.jarList.get(k));
