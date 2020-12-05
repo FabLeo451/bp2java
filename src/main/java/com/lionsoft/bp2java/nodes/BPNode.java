@@ -38,7 +38,7 @@ abstract class BPNode {
   List<BPConnector> output;
   List<String> exec;
 
-  public List<String> importList;
+  //public List<String> importList;
   public List<String> jarList;
   public List<String> includeList;
 
