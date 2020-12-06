@@ -32,13 +32,13 @@ public class BPWhileLoop extends BPNode {
     
     return code;
   }
-  
+/*  
   public String compile() {
     if (super.compile() == null)
       return null;
       
     return (translate());
   }
-
+*/
 };
 

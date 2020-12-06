@@ -41,10 +41,10 @@ public class BPSwitchInteger extends BPNode {
     
     return code;
   }
-  
+ /* 
   public String compile() {
     return (translate());
   }
-
+*/
 };
 

@@ -50,7 +50,7 @@ abstract class BPNode {
   // Include an Object array for input values
   private boolean javaInputArray = false;
 
-  Boolean compiled;         /* Already compiled (to avoid loops) */
+  Boolean compiled = false;         /* Already compiled (to avoid loops) */
   //String message;
 
   public BPNode() {
@@ -348,9 +348,31 @@ abstract class BPNode {
   public abstract String translate();
   
   public String compile() {
+    if (compiled)
+      return(java);
+    
+    compiled = true;
+
+    System.out.println("Compiling "+blueprint.getName()+"."+this.name);
+      
+    // Check connectors
     if (!checkConnectors())
       return null;
       
-    return(initCode());
+    // Compile nodes where input come (eg. operators)
+    for (int i=0; i<nIn; i++) {
+      BPConnector c = getInputConnector(i);
+
+      if (!c.getExec() && c.isConnected()) {
+        if (c.getConnected().getNode().compile() == null)
+          return null;
+      }
+    }
+    
+    initCode();
+
+    java = translate();
+    
+    return(java);
   }
 };

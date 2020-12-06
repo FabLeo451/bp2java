@@ -24,13 +24,13 @@ public class BPGet extends BPNode {
   public String translate() {
     return variable;
   }
-  
+ /* 
   public String compile() {
     if (super.compile() == null)
       return null;
       
     return (translate());
   }
-
+*/
 };
 

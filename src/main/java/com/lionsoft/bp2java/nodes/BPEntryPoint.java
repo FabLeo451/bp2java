@@ -20,13 +20,20 @@ public class BPEntryPoint extends BPNode {
   }
   
   public String compile() {
-    if (super.compile() == null)
-      return null;
+    /*if (super.compile() == null)
+      return null;*/
+      
+    if (compiled)
+      return(java);
+      
+    compiled = true;
       
     if (getOutputConnector(0).isConnected())
-      return (getOutputConnector(0).getConnectedNode().compile());
+      java = getOutputConnector(0).getConnectedNode().compile();
     else
-      return ("");
+      java = "";
+      
+    return(java);
   }
 
 };

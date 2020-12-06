@@ -61,12 +61,14 @@ public class BPOperator extends BPNode {
     
     return code;
   }
-  
+/*  
   public String compile() {
+    System.out.println("Compiling operator "+this.name);
+    
     if (super.compile() == null)
       return null;
       
     return (translate());
-  }
+  }*/
 };
 
