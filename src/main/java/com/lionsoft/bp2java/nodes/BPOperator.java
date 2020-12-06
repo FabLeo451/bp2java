@@ -12,8 +12,8 @@ public class BPOperator extends BPNode {
     setType (BPNode.OPERATOR);
   }
  
-  public BPOperator(JSONObject jo) {
-    super(jo);
+  public BPOperator(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
     
     if (jo.containsKey("symbol"))
       symbol = (String) jo.get("symbol");
@@ -25,7 +25,7 @@ public class BPOperator extends BPNode {
     return symbol;
   }
   
-  public String getCode() {
+  public String translate() {
     String code;
     
     //System.out.println(getName()+": java = "+java);
@@ -63,7 +63,10 @@ public class BPOperator extends BPNode {
   }
   
   public String compile() {
-    return (getCode());
+    if (super.compile() == null)
+      return null;
+      
+    return (translate());
   }
 };
 

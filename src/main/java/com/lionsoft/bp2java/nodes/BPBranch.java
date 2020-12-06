@@ -9,12 +9,12 @@ public class BPBranch extends BPNode {
     setType (BPNode.BRANCH);
   }
  
-  public BPBranch(JSONObject jo) {
-    super(jo);
+  public BPBranch(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
     setType (BPNode.BRANCH);
   }
   
-  public String getCode() {
+  public String translate() {
     String code, bt = "", bf = "";
     
     BPConnector ct = getOutputConnector(0); // True connector
@@ -25,6 +25,9 @@ public class BPBranch extends BPNode {
 
     if (cf != null && cf.getExec() && cf.isConnected())
       bf = cf.getConnectedNode().compile();
+      
+    if (bt == null || bf == null)
+      return null;
     
     code = "if (" + getInputConnector(1).getValueAsString() + ") {" + System.lineSeparator();
     code += bt + System.lineSeparator();
@@ -35,7 +38,10 @@ public class BPBranch extends BPNode {
   }
   
   public String compile() {
-    return (getCode());
+    if (super.compile() == null)
+      return null;
+      
+    return (translate());
   }
 
 };

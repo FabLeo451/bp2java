@@ -39,8 +39,10 @@ abstract class BPNode {
   List<String> exec;
 
   //public List<String> importList;
-  public List<String> jarList;
+  //public List<String> jarList;
   public List<String> includeList;
+  
+  private Blueprint blueprint; // Blueprint fo this node
 
   // Auto-variables referenced by output connectors
   public List<Reference> referenceList;
@@ -49,21 +51,22 @@ abstract class BPNode {
   private boolean javaInputArray = false;
 
   Boolean compiled;         /* Already compiled (to avoid loops) */
-  String message;
+  //String message;
 
   public BPNode() {
     input = new ArrayList<BPConnector>();
     output = new ArrayList<BPConnector>();
     //importList = new ArrayList<String>(); // Now read from blueprint
-    jarList = new ArrayList<String>();
+    //jarList = new ArrayList<String>();
     referenceList = new ArrayList<Reference>();
     includeList = new ArrayList<String>();
     nExec = 0;
   }
 
-  public BPNode(JSONObject jn) {
+  public BPNode(Blueprint blueprint, JSONObject jn) {
     this();
     set(jn);
+    this.blueprint = blueprint;
   }
 
   public void setId (int id) {
@@ -89,12 +92,12 @@ abstract class BPNode {
   public String getName () {
     return (name);
   }
-
+/*
   public String getMessage () {
     return (message);
-  }
+  }*/
 
-  public boolean check () {
+  public boolean checkConnectors () {
     //System.out.println("Checking "+getName()+ " ("+nIn+" connectors)");
 
     for (int i=0; i<nIn; i++) {
@@ -103,7 +106,7 @@ abstract class BPNode {
       //System.out.println("  "+i+" "+c.getLabel()+" connected:"+c.isConnected()+" value:"+c.getValue());
 
       if (c.mustBeConnected() && !c.isConnected()) {
-        message = "Connector '"+c.getLabel()+"' of node '"+getName()+"' should be connected.";
+        this.blueprint.setResult(Code.ERR_MUST_CONNECT, "Connector '"+c.getLabel()+"' of node '"+getName()+"' should be connected.");
         return false;
       }
     }
@@ -111,8 +114,7 @@ abstract class BPNode {
     return true;
   }
 
-  public String initCode () {
-    //System.out.println("[getCode] javaInputArray = "+javaInputArray);
+  public String initCode() {
     String autoCode = "";
 
     if (type != OPERATOR)
@@ -135,27 +137,37 @@ abstract class BPNode {
 
     java = autoCode + java;
 
-    //System.out.println("[getCode] java = "+java);
 
     return (java);
   }
 
-  public String getCode () {
+  public String getJava() {
     return (java);
   }
-
-  public String getDeclare () {
+  
+  public void setJava(String j) {
+    java = j;
+  }
+  
+  public String getDeclare() {
     return (declare);
   }
 
-  public void getSubsequentCode () {
+  public boolean getSubsequentCode () {
     for (int i=0; i<nOut; i++) {
       BPConnector c = getOutputConnector(i);
 
       if (c != null && c.getExec() && c.isConnected()) {
-        exec.set(i, c.getConnectedNode().compile());
+        String s = c.getConnectedNode().compile();
+        
+        if (s == null)
+          return false;
+          
+        exec.set(i, s);
       }
     }
+    
+    return true;
   }
 
   public int getInputParamsCount() {
@@ -333,5 +345,12 @@ abstract class BPNode {
     return includedJava != null ? includedJava : "";
   }*/
 
-  public abstract String compile();
+  public abstract String translate();
+  
+  public String compile() {
+    if (!checkConnectors())
+      return null;
+      
+    return(initCode());
+  }
 };

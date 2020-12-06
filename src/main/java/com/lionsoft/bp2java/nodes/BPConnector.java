@@ -356,10 +356,10 @@ class BPConnector {
           else if (getNode().getType() == BPNode.GET)
             result = ((BPGet)getNode()).getVariableName();
           else if (getNode().getType() == BPNode.OPERATOR)
-            result = getNode().getCode();
+            result = getNode().getJava();
           else {
             if (direction == BPConnector.INPUT && isConnected())
-              result = getNode().getCode();
+              result = getNode().getJava();
           }
         }
       }

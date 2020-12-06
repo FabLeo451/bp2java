@@ -9,16 +9,17 @@ public class BPSwitchInteger extends BPNode {
     setType (BPNode.SWITCH_INTEGER);
   }
  
-  public BPSwitchInteger(JSONObject jo) {
-    super(jo);
+  public BPSwitchInteger(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
     setType (BPNode.SWITCH_INTEGER);
   }
   
-  public String getCode() {
+  public String translate() {
     String code = "";
     
     // Set exec array
-    getSubsequentCode ();
+    if (!getSubsequentCode())
+      return null;
     
     if (getOutputParamsCount() == 1) {
       // Only default
@@ -42,7 +43,7 @@ public class BPSwitchInteger extends BPNode {
   }
   
   public String compile() {
-    return (getCode());
+    return (translate());
   }
 
 };

@@ -20,19 +20,23 @@ public class Blueprint {
   public final static int MAIN = 1;
   public final static int EVENTS = 2;
 */
+/*
   public final static int SUCCESS = 0;
   public final static int ERR_FILE_NOT_FOUND = 1;
   public final static int ERR_IO = 2;
   public final static int ERR_JSON_PARSING = 3;
   public final static int ERR_MUST_CONNECT = 4;
-
-  int result = SUCCESS;
+*/
+  //int result = SUCCESS;
+    
+  Code resultCode = Code.SUCCESS;
+  String message = "OK";
 
   JSONObject jbp;
 
   protected String id;
   protected Integer internalId;
-  protected String name, method, message;
+  protected String name, method;
   protected BlueprintType type;
 
   //Map<Integer, String> types;   // Deprecated
@@ -50,6 +54,7 @@ public class Blueprint {
 
   protected String declareSection;
   protected String includedJava = "";
+  protected String javaSource;
 
   public Blueprint() {
     nodes = new ArrayList<BPNode>();
@@ -81,7 +86,7 @@ public class Blueprint {
   public Blueprint(BPProgram program, JSONObject jo) {
     this();
     this.program = program;
-    result = createFromJson(jo);
+    resultCode = createFromJson(jo);
 
     /*if (result != SUCCESS) {
       System.err.println("Error "+result+" "+message);
@@ -115,12 +120,17 @@ public class Blueprint {
     return (name);
   }
 
-  public int getResult() {
-    return (result);
+  public Code getResult() {
+    return (resultCode);
   }
 
   public String getMessage() {
     return (message);
+  }
+  
+  public void setResult(Code code, String message) {
+    this.resultCode = code;
+    this.message = message;
   }
 
   public BlueprintType getType() {
@@ -134,8 +144,13 @@ public class Blueprint {
   public List<BPNode> getNodes() {
     return (nodes);
   }
+  
+  public void addJar(String jar) {
+    if (!jarList.contains(jar))
+      jarList.add(jar);
+  }
 
-  public int createFromJson(JSONObject jbp) {
+  public Code createFromJson(JSONObject jbp) {
     id = (String) jbp.get("id");
     internalId = (Integer) ((Long) jbp.get("internalId")).intValue();
     name = (String) jbp.get("name");
@@ -157,10 +172,17 @@ public class Blueprint {
       }
     }
 
+		// Jar list
+		if (jbp.containsKey("jar")) {
+      JSONArray jJarArray = (JSONArray) jbp.get("jar");
+
+      for (int i=0; i < jJarArray.size(); i++)
+        addJar((String) jJarArray.get(i));
+    }
+
     // Types: convert json array into <1,Integer> <2;FLoat> ecc...
 
     if (jbp.containsKey("types")) {
-      System.out.println("Types of "+name);
       JSONArray jTypesArray = (JSONArray) jbp.get("types");
 
       for (int i = 0; i < jTypesArray.size(); i++) {
@@ -219,19 +241,19 @@ public class Blueprint {
       String name = (String) jnode.get("name");
       int type = ((Long)jnode.get("type")).intValue();
 
-      //System.out.println(name+" "+type);
+      //System.out.println(this.name+"."+name+" "+type);
 
       BPNode node = null;
 
       switch (type) {
         case BPNode.ENTRY_POINT:
-          entryPointNode = new BPEntryPoint(jnode);
+          entryPointNode = new BPEntryPoint(this, jnode);
           nodes.add(entryPointNode);
           node = (BPNode) entryPointNode;
           break;
 
         case BPNode.RETURN:
-          returnNode = new BPReturn(jnode);
+          returnNode = new BPReturn(this, jnode);
           nodes.add(returnNode);
           node = (BPNode) returnNode;
 
@@ -240,15 +262,15 @@ public class Blueprint {
           break;
 
         case BPNode.SEQUENCE:
-          nodes.add(new BPSequence(jnode));
+          nodes.add(new BPSequence(this, jnode));
           break;
 
         case BPNode.BRANCH:
-          nodes.add(new BPBranch(jnode));
+          nodes.add(new BPBranch(this, jnode));
           break;
 
         case BPNode.OPERATOR:
-          BPOperator o = new BPOperator(jnode);
+          BPOperator o = new BPOperator(this, jnode);
           nodes.add(o);
 /*
           for (int k=0; k<o.importList.size(); k++) {
@@ -256,10 +278,12 @@ public class Blueprint {
               importList.add(o.importList.get(k));
           }
 */
+/*
           for (int k=0; k<o.jarList.size(); k++) {
             if (!jarList.contains(o.jarList.get(k)))
               jarList.add(o.jarList.get(k));
           }
+*/
 
           for (int k=0; k<o.referenceList.size(); k++) {
             if (o.referenceList.get(k).getRefType() == Reference.LOCAL)
@@ -269,7 +293,7 @@ public class Blueprint {
           break;
 
         case BPNode.FUNCTION:
-          BPFunction f = new BPFunction(jnode);
+          BPFunction f = new BPFunction(this, jnode);
           nodes.add(f);
           node = (BPNode) f;
 /*
@@ -278,11 +302,12 @@ public class Blueprint {
               importList.add(f.importList.get(k));
           }
 */
+/*
           for (int k=0; k<f.jarList.size(); k++) {
             if (!jarList.contains(f.jarList.get(k)))
               jarList.add(f.jarList.get(k));
           }
-
+*/
           for (int k=0; k<f.referenceList.size(); k++) {
             if (f.referenceList.get(k).getRefType() == Reference.LOCAL)
               locals.add(f.referenceList.get(k).getDeclaration());
@@ -291,7 +316,7 @@ public class Blueprint {
           break;
 
         case BPNode.BLUEPRINT:
-          BPBlueprint bp = new BPBlueprint(jnode);
+          BPBlueprint bp = new BPBlueprint(this, jnode);
           bp.setBlueprintList(program.getBlueprintList());
           nodes.add(bp);
 
@@ -302,23 +327,23 @@ public class Blueprint {
           break;
 
         case BPNode.GET:
-          nodes.add(new BPGet(jnode));
+          nodes.add(new BPGet(this, jnode));
           break;
 
         case BPNode.SET:
-          nodes.add(new BPSet(jnode));
+          nodes.add(new BPSet(this, jnode));
           break;
 
         case BPNode.WHILE_LOOP:
-          nodes.add(new BPWhileLoop(jnode));
+          nodes.add(new BPWhileLoop(this, jnode));
           break;
 
         case BPNode.SWITCH_INTEGER:
-          nodes.add(new BPSwitchInteger(jnode));
+          nodes.add(new BPSwitchInteger(this, jnode));
           break;
 
         case BPNode.FOR_LOOP:
-          BPForLoop fl = new BPForLoop(jnode);
+          BPForLoop fl = new BPForLoop(this, jnode);
           nodes.add(fl);
 
           for (int k=0; k<fl.referenceList.size(); k++) {
@@ -328,11 +353,11 @@ public class Blueprint {
           break;
 
         case BPNode.EXIT:
-          nodes.add(new BPExit(jnode));
+          nodes.add(new BPExit(this, jnode));
           break;
 
         case BPNode.EVENT:
-          BPEvent event = new BPEvent(jnode);
+          BPEvent event = new BPEvent(this, jnode);
           nodes.add(event);
           //eventNodes.put(EventType.values()[event.getType()], event);
           break;
@@ -386,23 +411,29 @@ public class Blueprint {
       }
     }
 
-
+/*
     for (BPNode node : nodes) {
-      if (!node.check()) {
+      if (!node.checkConnectors()) {
         //System.err.println(node.getMessage());
-        message = node.getMessage();
-        return (ERR_MUST_CONNECT);
+        //message = node.getMessage();
+        return (resultCode);
       }
 
       node.initCode();
     }
+*/
 
-
-    return (SUCCESS);
+    return (Code.SUCCESS);
+  }
+  
+  public String getJavaSource() {
+    return(javaSource);
   }
 
-  public String toJavaCode() {
-    String functionCode, scope, returnType, header, parameters = "", body = "";
+  public String transtaleToJava() {
+    String /*functionCode,*/ scope, returnType, header, parameters = "", body = "";
+    
+    javaSource = "";
 
     //scope = (getType() == Blueprint.MAIN) ? "public static" : "public";
     scope = "public static";
@@ -445,8 +476,11 @@ public class Blueprint {
 
 
     body = entryPointNode.compile();
+    
+    if (body == null)
+      return null;
 
-    functionCode = "@Blueprint(id=\""+id+"\", internalId="+internalId+", name=\""+name+"\", type=\""+type+"\")" +
+    javaSource = "@Blueprint(id=\""+id+"\", internalId="+internalId+", name=\""+name+"\", type=\""+type+"\")" +
                    (returnNode.returnsValue() ?
                       "@BPConnector(id="+returnNode.getInputConnector(1).getId()+", "+
                                    "label=\""+returnNode.getInputConnector(1).getLabel()+"\")" :
@@ -457,7 +491,7 @@ public class Blueprint {
                    //(returnNode.returnsValue() ? returnNode.getCode(): "") +
                    "}" + System.lineSeparator();
 
-    return functionCode;
+    return javaSource;
   }
 
   public void setProgram(BPProgram p) {

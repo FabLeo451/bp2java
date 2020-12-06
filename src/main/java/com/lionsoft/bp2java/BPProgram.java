@@ -112,7 +112,7 @@ public class BPProgram {
       default:
         Blueprint b = new Blueprint (this, jbp);
 
-				if (b.getResult() != Blueprint.SUCCESS) {
+				if (b.getResult() != Code.SUCCESS) {
           System.err.println(b.getMessage());
           return false;
         }
@@ -163,14 +163,34 @@ public class BPProgram {
       e.printStackTrace();
     }
 
-    //code += "public class "+getName()+" {" + System.lineSeparator();
-
+    // Compile blueprints
+    
     for (int i = 0; i < blueprintList.size(); i++) {
-      System.out.println("Blueprint "+blueprintList.get(i).getName());
+      Blueprint b = blueprintList.get(i);
+      
+      //System.out.println("Compiling "+b.getName());
+      
+      if (b.transtaleToJava() == null) {
+        System.err.println("Blueprint "+b.getName()+": "+b.getMessage());
+        return null;
+      }
+    }    
+
+    // Build program
+    
+    for (int i = 0; i < blueprintList.size(); i++) {
+      //System.out.println("Blueprint "+blueprintList.get(i).getName());
 
       Blueprint b = blueprintList.get(i);
 
-      code += b.toJavaCode();
+      String source = b.getJavaSource();
+/*      
+      if (source == null) {
+        System.err.println(b.getMessage());
+        return null;
+      }*/
+        
+      code += source;
 
       for (int k=0; k<b.importList.size(); k++)
         //importList.add(b.importList.get(k));

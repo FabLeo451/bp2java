@@ -9,15 +9,16 @@ public class BPSequence extends BPNode {
     setType (BPNode.SEQUENCE);
   }
  
-  public BPSequence(JSONObject jo) {
-    super(jo);
+  public BPSequence(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
   }
   
-  public String getCode() {
+  public String translate() {
     String code = "";
     
     // Set exec array
-    getSubsequentCode ();
+    if (!getSubsequentCode())
+      return null;
   
     for (int i=0; i<nOut; i++) {
       BPConnector c = getOutputConnector(i);
@@ -32,7 +33,10 @@ public class BPSequence extends BPNode {
   }
   
   public String compile() {
-    return (getCode());
+    if (super.compile() == null)
+      return null;
+      
+    return (translate());
   }
 
 };

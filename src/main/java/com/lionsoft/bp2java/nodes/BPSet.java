@@ -11,8 +11,8 @@ public class BPSet extends BPNode {
     setType (BPNode.SET);
   }
  
-  public BPSet(JSONObject jo) {
-    super(jo);
+  public BPSet(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
 
     variable = getInputConnector(1).getLabel();
     getOutputConnector(1).setFixedOutput(variable);
@@ -22,7 +22,7 @@ public class BPSet extends BPNode {
     return variable;
   }
   
-  public String getCode() {
+  public String translate() {
     String code;
     
     code = variable + " = " + getInputConnector(1).getValueAsString() + ";" + System.lineSeparator();
@@ -36,7 +36,10 @@ public class BPSet extends BPNode {
   }
   
   public String compile() {
-    return (getCode());
+    if (super.compile() == null)
+      return null;
+      
+    return (translate());
   }
 
 };

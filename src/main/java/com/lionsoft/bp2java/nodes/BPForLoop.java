@@ -9,8 +9,8 @@ public class BPForLoop extends BPFunction {
     setType (BPNode.FOR_LOOP);
   }
  
-  public BPForLoop(JSONObject jo) {
-    super(jo);
+  public BPForLoop(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
     setType (BPNode.FOR_LOOP);
   }
 };

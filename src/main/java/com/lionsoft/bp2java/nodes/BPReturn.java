@@ -16,8 +16,8 @@ public class BPReturn extends BPNode {
     returnsValueFlag = false;
   }
  
-  public BPReturn(JSONObject jo) {
-    super(jo);
+  public BPReturn(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
     returnsValueFlag = nIn > 1; // Exec is always present
     
     if (returnsValueFlag) {
@@ -43,7 +43,7 @@ public class BPReturn extends BPNode {
     return (returnDim);
   }
   
-  public String getCode() {
+  public String translate() {
     String code = "return";
     
     if (nIn > 1) {
@@ -58,7 +58,10 @@ public class BPReturn extends BPNode {
   }  
   
   public String compile() {
-    return (getCode());
+    if (super.compile() == null)
+      return null;
+      
+    return (translate());
   }
 };
 

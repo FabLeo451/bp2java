@@ -11,11 +11,11 @@ public class BPFunction extends BPNode {
     setType (BPNode.FUNCTION);
   }
  
-  public BPFunction(JSONObject jo) {
-    super(jo);
+  public BPFunction(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
     setType (BPNode.FUNCTION);
   }
-  
+/*  
   public String getJava() {
     return java;
   }
@@ -23,11 +23,11 @@ public class BPFunction extends BPNode {
   public void setJava(String j) {
     java = j;
   }
-  
-  public String getCode() {   
+  */
+  public String translate() {   
     String code;
     
-    super.getCode();
+    super.getJava();
     
     // Set exec array
     getSubsequentCode ();
@@ -85,7 +85,10 @@ public class BPFunction extends BPNode {
   }
   
   public String compile() {
-    return (getCode());
+    if (super.compile() == null)
+      return null;
+      
+    return (translate());
   }
 };
 

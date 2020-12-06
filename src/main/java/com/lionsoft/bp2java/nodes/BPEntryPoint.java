@@ -10,12 +10,19 @@ public class BPEntryPoint extends BPNode {
     setType (ENTRY_POINT);
   }
  
-  public BPEntryPoint(JSONObject jo) {
-    super(jo);
+  public BPEntryPoint(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
     setType (ENTRY_POINT);
   }
   
+  public String translate() { 
+    return null;
+  }
+  
   public String compile() {
+    if (super.compile() == null)
+      return null;
+      
     if (getOutputConnector(0).isConnected())
       return (getOutputConnector(0).getConnectedNode().compile());
     else

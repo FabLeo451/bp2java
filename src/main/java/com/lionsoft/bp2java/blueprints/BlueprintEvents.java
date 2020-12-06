@@ -34,9 +34,11 @@ public class BlueprintEvents extends Blueprint {
   }
 
   // Overrides
-  public String toJavaCode() {
-    String functionCode, header, declareSection="", body;
+  public String transtaleToJava() {
+    String /*functionCode,*/ header, declareSection="", body;
     String begin="", exception="", end="";
+    
+    javaSource = "";
     
     header = "public static void " + getMethodName() + "(EventType event, String message) throws ExitException ";
 
@@ -56,12 +58,12 @@ public class BlueprintEvents extends Blueprint {
            "} else { }"+ System.lineSeparator();
 
 
-    functionCode = header + " {" + System.lineSeparator() +
+    javaSource = header + " {" + System.lineSeparator() +
                    declareSection + System.lineSeparator() +
                    body + System.lineSeparator() +
                    "}" + System.lineSeparator();
     
-    return functionCode;
+    return javaSource;
   }
 
 };

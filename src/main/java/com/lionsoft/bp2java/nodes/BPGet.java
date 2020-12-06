@@ -11,8 +11,8 @@ public class BPGet extends BPNode {
     setType (BPNode.GET);
   }
  
-  public BPGet(JSONObject jo) {
-    super(jo);
+  public BPGet(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
 
     variable = getOutputConnector(0).getLabel();
   }
@@ -21,12 +21,15 @@ public class BPGet extends BPNode {
     return variable;
   }
   
-  public String getCode() {
+  public String translate() {
     return variable;
   }
   
   public String compile() {
-    return (getCode());
+    if (super.compile() == null)
+      return null;
+      
+    return (translate());
   }
 
 };

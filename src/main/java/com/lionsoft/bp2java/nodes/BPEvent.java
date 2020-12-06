@@ -12,8 +12,8 @@ public class BPEvent extends BPNode {
     setType (EVENT);
   }
  
-  public BPEvent(JSONObject jo) {
-    super(jo);
+  public BPEvent(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
     setType (EVENT);
     //System.out.println("BPEvent "+getName()+" "+(String) jo.get("event"));
     event = EventType.valueOf((String) jo.get("event"));
@@ -23,7 +23,14 @@ public class BPEvent extends BPNode {
     return(event);
   }
   
+  public String translate() { 
+    return null;
+  }
+  
   public String compile() {
+    if (super.compile() == null)
+      return null;
+      
     if (getOutputConnector(0).isConnected())
       return (getOutputConnector(0).getConnectedNode().compile());
     else

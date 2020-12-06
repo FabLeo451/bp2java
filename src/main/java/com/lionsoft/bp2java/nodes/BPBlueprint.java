@@ -15,8 +15,8 @@ public class BPBlueprint extends BPFunction {
     setType (BPNode.BLUEPRINT);
   }
   
-  public BPBlueprint(JSONObject jo) {
-    super(jo);
+  public BPBlueprint(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
     setType (BPNode.BLUEPRINT);
     
     //method = (String) jo.get("method");
@@ -60,8 +60,8 @@ public class BPBlueprint extends BPFunction {
     blueprintList = l;
   }
 
-  public String getCode() {
-    String source = super.getCode();
+  public String translate() {
+    String source = super.translate();
     
     // Search the blueprint to be called by internal id
     

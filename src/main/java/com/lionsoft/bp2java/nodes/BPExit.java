@@ -9,8 +9,8 @@ public class BPExit extends BPFunction {
     setType (BPNode.EXIT);
   }
   
-  public BPExit(JSONObject jo) {
-    super(jo);
+  public BPExit(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
     setType (BPNode.EXIT);
     
     // Do nothing: Java code is in node definition

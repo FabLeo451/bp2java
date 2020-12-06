@@ -9,11 +9,11 @@ public class BPWhileLoop extends BPNode {
     setType (BPNode.WHILE_LOOP);
   }
  
-  public BPWhileLoop(JSONObject jo) {
-    super(jo);
+  public BPWhileLoop(Blueprint blueprint, JSONObject jo) {
+    super(blueprint, jo);
   }
   
-  public String getCode() {
+  public String translate() {
     String code, iteration = "";
     
     BPConnector ci = getOutputConnector(0); // Iteration connector
@@ -34,7 +34,10 @@ public class BPWhileLoop extends BPNode {
   }
   
   public String compile() {
-    return (getCode());
+    if (super.compile() == null)
+      return null;
+      
+    return (translate());
   }
 
 };
