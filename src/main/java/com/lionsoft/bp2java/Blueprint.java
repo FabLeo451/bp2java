@@ -35,7 +35,7 @@ public class Blueprint {
   protected String name, method, message;
   protected BlueprintType type;
 
-  Map<Integer, String> types;   // Deprecated
+  //Map<Integer, String> types;   // Deprecated
   Map<String, BPType> mapTypes; // Type name is the key
 
   BPEntryPoint entryPointNode;
@@ -62,12 +62,13 @@ public class Blueprint {
 
     // Standard types
     // {"_exec_", "int", "float", "String", "Boolean"};
+    /*
     types = new HashMap<Integer, String>();
     types.put(0, "_exec");
     types.put(1, "Integer");
     types.put(2, "Double");
     types.put(3, "String");
-    types.put(4, "Boolean");
+    types.put(4, "Boolean");*/
 
     mapTypes = new HashMap<String, BPType>();
     mapTypes.put("_exec", new BPType(0, "_exec", null));
@@ -159,20 +160,21 @@ public class Blueprint {
     // Types: convert json array into <1,Integer> <2;FLoat> ecc...
 
     if (jbp.containsKey("types")) {
+      System.out.println("Types of "+name);
       JSONArray jTypesArray = (JSONArray) jbp.get("types");
 
       for (int i = 0; i < jTypesArray.size(); i++) {
         // Deprecated list (id is the key)
 
         JSONObject jtype = (JSONObject) jTypesArray.get(i);
-        int id = ((Long)jtype.get("id")).intValue();
+/*        int id = ((Long)jtype.get("id")).intValue();
 
-        types.put(id, (String)jtype.get("name"));
+        types.put(id, (String)jtype.get("name"));*/
 
         // New list (name is the key)
 
         mapTypes.put((String) jtype.get("name"),
-                     new BPType(id,
+                     new BPType(0, // Numeric id is deprecated
                                 (String) jtype.get("name"),
                                 jtype.containsKey("init") ? (String) jtype.get("init") : null));
       }
