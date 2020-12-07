@@ -17,6 +17,7 @@ import java.util.Iterator;
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
 import org.jgrapht.alg.ConnectivityInspector;
+import org.jgrapht.alg.CycleDetector;
 
 public class Blueprint {
 /*
@@ -421,7 +422,7 @@ public class Blueprint {
       else {
         // Data connection (next points to previous)
         c2.connectTo(c1);
-        graph.addEdge(c2.getNode(), c1.getNode());
+        // graph.addEdge(c2.getNode(), c1.getNode()); // Don't add data edges since introduces cycles
       }
     }
 
@@ -431,17 +432,32 @@ public class Blueprint {
   public String getJavaSource() {
     return(javaSource);
   }
+  
+  public boolean checkGraph() {
+    // Check if Return node is reachable
+    if (entryPointNode != null && returnNode != null) {
+      ConnectivityInspector<BPNode, DefaultEdge> ci = new ConnectivityInspector<BPNode, DefaultEdge>(graph);
+      
+      if (!ci.pathExists(entryPointNode, returnNode))
+        System.out.println("Warning: blueprint "+this.name+": Return node not reachable");
+    }
+    
+    // Check cycles
+    CycleDetector<BPNode, DefaultEdge> cd = new CycleDetector<BPNode, DefaultEdge>(graph);
+ 
+    if (cd.detectCycles()) {
+      setResult(Code.ERR_CYCLES, "Cycle detected");
+      return false;
+    }
+    
+    return true;
+  }
 
   public String compile() {
     String /*functionCode,*/ scope, returnType, header, parameters = "", body = "";
     
-    // Graph analysis
-    if (entryPointNode != null && returnNode != null) {
-      ConnectivityInspector<BPNode, DefaultEdge> ci = new ConnectivityInspector(graph);
-      
-      if (!ci.pathExists(entryPointNode, returnNode))
-        System.out.println("Warning: blueprint "+this.name+": Return node not connected");
-    }
+    if (!checkGraph())
+      return null;
     
     javaSource = "";
 

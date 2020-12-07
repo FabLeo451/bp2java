@@ -5,6 +5,7 @@ public enum Code {
     ERR_FILE_NOT_FOUND,
     ERR_IO,
     ERR_JSON_PARSING,
-    ERR_MUST_CONNECT
+    ERR_MUST_CONNECT,
+    ERR_CYCLES
 }
 

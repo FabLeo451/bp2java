@@ -153,6 +153,19 @@ public class BPProgram {
   public String toJavaCode () {
     String template = "", importSection = "", /*globalSection = "", */ includeSection = "";
 
+    // Compile blueprints
+    
+    for (int i = 0; i < blueprintList.size(); i++) {
+      Blueprint b = blueprintList.get(i);
+      
+      //System.out.println("Compiling "+b.getName());
+      
+      if (b.compile() == null) {
+        System.err.println("Error: Blueprint "+b.getName()+": "+b.getMessage());
+        return null;
+      }
+    }    
+
     // Load template
 
     try {
@@ -162,19 +175,6 @@ public class BPProgram {
     } catch (Exception e) {
       e.printStackTrace();
     }
-
-    // Compile blueprints
-    
-    for (int i = 0; i < blueprintList.size(); i++) {
-      Blueprint b = blueprintList.get(i);
-      
-      //System.out.println("Compiling "+b.getName());
-      
-      if (b.compile() == null) {
-        System.err.println("Blueprint "+b.getName()+": "+b.getMessage());
-        return null;
-      }
-    }    
 
     // Build program
     

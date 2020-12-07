@@ -40,6 +40,9 @@ public class BlueprintEvents extends Blueprint {
     
     javaSource = "";
     
+    if (!checkGraph())
+      return null;
+    
     header = "public static void " + getMethodName() + "(EventType event, String message) throws ExitException ";
 
      for (int k=0; k<locals.size(); k++)
@@ -48,6 +51,9 @@ public class BlueprintEvents extends Blueprint {
     begin = eventNodes.get(EventType.BEGIN).compile();
     exception = eventNodes.get(EventType.EXCEPTION).compile();
     end = eventNodes.get(EventType.END).compile();
+    
+    if (begin == null || exception == null || end == null)
+      return null;
 
 		body = "if (event == EventType.BEGIN) {"+ System.lineSeparator() +
 		       begin +
