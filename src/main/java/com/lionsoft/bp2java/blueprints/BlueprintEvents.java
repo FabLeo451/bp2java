@@ -34,7 +34,7 @@ public class BlueprintEvents extends Blueprint {
   }
 
   // Overrides
-  public String transtaleToJava() {
+  public String compile() {
     String /*functionCode,*/ header, declareSection="", body;
     String begin="", exception="", end="";
     

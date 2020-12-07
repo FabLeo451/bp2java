@@ -353,7 +353,7 @@ abstract class BPNode {
     
     compiled = true;
 
-    System.out.println("Compiling "+blueprint.getName()+"."+this.name);
+    //System.out.println("Compiling "+blueprint.getName()+"."+this.name);
       
     // Check connectors
     if (!checkConnectors())
@@ -372,6 +372,8 @@ abstract class BPNode {
     initCode();
 
     java = translate();
+    
+    
     
     return(java);
   }

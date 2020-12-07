@@ -22,8 +22,6 @@ public class BlueprintCompiler {
     int resultCode = 0;
     
     BPProgram program = new BPProgram();
-
-    System.out.println("Current direcotry: "+System.getProperty("user.dir"));	
 	  
     int c;
     LongOpt[] longopts = new LongOpt[7];
@@ -125,8 +123,8 @@ public class BlueprintCompiler {
             resultCode = 1;
         }
       }
-      else
-        System.out.println(code);
+      /*else
+        System.out.println(code);*/
 
       if (resultCode == 0) {
         // Manifest

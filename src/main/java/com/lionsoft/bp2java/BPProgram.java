@@ -170,7 +170,7 @@ public class BPProgram {
       
       //System.out.println("Compiling "+b.getName());
       
-      if (b.transtaleToJava() == null) {
+      if (b.compile() == null) {
         System.err.println("Blueprint "+b.getName()+": "+b.getMessage());
         return null;
       }
@@ -213,7 +213,7 @@ public class BPProgram {
      globalSection += "static "+entry.getValue().getDeclaration()+";" + System.lineSeparator();
     }
 
-    System.out.println("Updating template...");
+    //System.out.println("Updating template...");
 
     template = template
                .replace("{import}", importSection)

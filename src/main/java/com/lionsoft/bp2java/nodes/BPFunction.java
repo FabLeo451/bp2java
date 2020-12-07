@@ -45,9 +45,9 @@ public class BPFunction extends BPNode {
       BPConnector c = getInputConnector(i);
 
       if (!c.getExec()) {
-        System.out.println(this.name+" connector "+i);
+        //System.out.println(this.name+" connector "+i);
         code = code.replace("in{"+i+"}", c.getValueAsString());
-        System.out.println(c.getValueAsString());
+        //System.out.println(c.getValueAsString());
         //code = Pattern.compile("in\\{"+i+"\\}").matcher(code).quoteReplacement(c.getValueAsString());
         //System.out.println("in{"+i+"} -> "+c.getValueAsString());
       }

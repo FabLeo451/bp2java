@@ -14,6 +14,10 @@ import org.json.simple.parser.ParseException;
 
 import java.util.Iterator;
 
+import org.jgrapht.*;
+import org.jgrapht.graph.*;
+import org.jgrapht.alg.ConnectivityInspector;
+
 public class Blueprint {
 /*
   public final static int GENERIC = 0;
@@ -55,6 +59,8 @@ public class Blueprint {
   protected String declareSection;
   protected String includedJava = "";
   protected String javaSource;
+  
+  protected DirectedGraph<BPNode, DefaultEdge> graph;
 
   public Blueprint() {
     nodes = new ArrayList<BPNode>();
@@ -64,6 +70,8 @@ public class Blueprint {
     locals = new ArrayList<String>();
     name = "myBlueprint";
     method = name;
+    
+    graph = new DefaultDirectedGraph<>(DefaultEdge.class);
 
     // Standard types
     // {"_exec_", "int", "float", "String", "Boolean"};
@@ -257,8 +265,8 @@ public class Blueprint {
           nodes.add(returnNode);
           node = (BPNode) returnNode;
 
-          if (returnNode.returnsValue())
-            System.out.println("Returns "+returnNode.getReturnTypeName());
+          /*if (returnNode.returnsValue())
+            System.out.println("Returns "+returnNode.getReturnTypeName());*/
           break;
 
         case BPNode.SEQUENCE:
@@ -370,7 +378,7 @@ public class Blueprint {
       if (node != null) {
         for (int k=0; k<node.includeList.size(); k++) {
           String filename = program.getRootDir()+"/"+node.includeList.get(k).replace("{path}", node.nodePath);
-          System.out.println("Including "+filename);
+          //System.out.println("Including "+filename);
 
           try {
             includedJava += new String (Files.readAllBytes(Paths.get(filename)));
@@ -384,8 +392,12 @@ public class Blueprint {
       }
     }
 
-    // Edges
+    // Create graph
+    for (BPNode node : nodes) {
+      graph.addVertex(node);
+    }
 
+    // Edges
     int from, to;
     BPConnector c1, c2;
     JSONArray jEdgeArray = (JSONArray) jbp.get("edges");
@@ -404,24 +416,14 @@ public class Blueprint {
       if (c1.getExec()) {
         // Execution flow connection (previous points to next)
         c1.connectTo(c2);
+        graph.addEdge(c1.getNode(), c2.getNode());
       }
       else {
         // Data connection (next points to previous)
         c2.connectTo(c1);
+        graph.addEdge(c2.getNode(), c1.getNode());
       }
     }
-
-/*
-    for (BPNode node : nodes) {
-      if (!node.checkConnectors()) {
-        //System.err.println(node.getMessage());
-        //message = node.getMessage();
-        return (resultCode);
-      }
-
-      node.initCode();
-    }
-*/
 
     return (Code.SUCCESS);
   }
@@ -430,8 +432,16 @@ public class Blueprint {
     return(javaSource);
   }
 
-  public String transtaleToJava() {
+  public String compile() {
     String /*functionCode,*/ scope, returnType, header, parameters = "", body = "";
+    
+    // Graph analysis
+    if (entryPointNode != null && returnNode != null) {
+      ConnectivityInspector<BPNode, DefaultEdge> ci = new ConnectivityInspector(graph);
+      
+      if (!ci.pathExists(entryPointNode, returnNode))
+        System.out.println("Warning: blueprint "+this.name+": Return node not connected");
+    }
     
     javaSource = "";
 
@@ -501,4 +511,12 @@ public class Blueprint {
   public String getIncludedJava() {
     return includedJava != null ? includedJava : "";
   }
+/*  
+  public void addNodeToGraph(BPNode node) {
+    graph.addVertex(node);
+  }
+  
+  public void addEdgeToGraph(BPNode node1, BPNode node2) {
+    graph.addEdge(node1, node2);
+  }*/
 };
