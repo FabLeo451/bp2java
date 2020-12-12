@@ -49,6 +49,7 @@ class BPVariable {
     //this.type = ((Long)jvar.get("type")).intValue();
     this.typeName = (String) jvar.get("typeName");
     this.name = (String) jvar.get("name");
+    this.dimensions = ((Long) jvar.get("dimensions")).intValue();
     this.value = (Object) jvar.get("value");
 
     this.global = jvar.containsKey("global") ? (Boolean) jvar.get("global") : false;
