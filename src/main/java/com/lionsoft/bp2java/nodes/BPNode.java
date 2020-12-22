@@ -197,6 +197,8 @@ abstract class BPNode {
     setId(((Long)jn.get("id")).intValue());
     setName((String) jn.get("name"));
     setType(((Long)jn.get("type")).intValue());
+    
+    //System.out.println("* Node "+name);
 
     if (jn.containsKey("data")) {
       JSONObject jdata = (JSONObject) jn.get("data");
@@ -276,8 +278,8 @@ abstract class BPNode {
 
     for (int i = 0; i < nIn; i++) {
       JSONObject jc = (JSONObject) jConnectorArray.get(i);
-      BPConnector c = new BPConnector(BPConnector.INPUT, jc);
-      c.setNode(this);
+      BPConnector c = new BPConnector(this, BPConnector.INPUT, jc);
+      //c.setNode(this);
       input.add (c);
     }
 
@@ -289,8 +291,8 @@ abstract class BPNode {
 
     for (int i = 0; i < nOut; i++) {
       JSONObject jc = (JSONObject) jConnectorArray.get(i);
-      BPConnector c = new BPConnector(BPConnector.OUTPUT, jc);
-      c.setNode(this);
+      BPConnector c = new BPConnector(this, BPConnector.OUTPUT, jc);
+      //c.setNode(this);
 
       if (c.getReference() != null) {
         referenceList.add(c.getReference());

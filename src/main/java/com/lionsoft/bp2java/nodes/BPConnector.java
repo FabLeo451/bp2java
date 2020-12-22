@@ -68,8 +68,10 @@ class BPConnector {
     //mustConnect = false;
   }
 
-  public BPConnector(int direction, JSONObject jc) {
+  public BPConnector(BPNode node, int direction, JSONObject jc) {
     this();
+    
+    this.node = node;
 
     setId(((Long) jc.get("id")).intValue());
     setLabel((String) jc.get("label"));
@@ -80,6 +82,8 @@ class BPConnector {
     setDataTypeName((String) jc.get("dataType"));
     setExec((Boolean) jc.get("exec"));
     setDimensions(((Long) jc.get("dimensions")).intValue());
+    
+    //System.out.println("Connector "+getId()+" "+node.getName()+"."+getLabel());
 
     //type = new BPType((String) jc.get("dataTypeName"));
     type = new BPType((String) jc.get("dataType"));
@@ -105,7 +109,7 @@ class BPConnector {
           references = new Reference(((Long)jref.get("input")).intValue());
         }
         else if (jref.containsKey("variable")) {
-          // Reference a local variable
+          // Reference a local variable to be declared
           // "references": {"variable":"varName"}
           String arrayAttr = dimensions == 0 ? "" : (dimensions == 1 ? "[]" : "[][]");
           createReferenceLocalVariable (type.getName() + arrayAttr, (String) jref.get("variable"));
@@ -114,7 +118,7 @@ class BPConnector {
         else if (jref.containsKey("object")) {
           // Reference an object
           setFixedOutput((String) jref.get("object"));
-          //System.out.println(getLabel()+" references "+(String) jref.get("object"));
+          System.out.println(getLabel()+" references "+fixedOutput);
         }
         else {
           System.out.println("'references' without target object");
