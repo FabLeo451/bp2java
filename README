@@ -3,4 +3,5 @@ mvn compile assembly:single
 ln -s $(pwd)/target/bp2java-0.0.1-jar-with-dependencies.jar /media/fabio/DATA/Source/JLogic-all/JLogic/target/bp2java
 ln -s $(pwd)/target/bp2java-0.0.1-jar-with-dependencies.jar /media/hal9k/DATA/Source/JLogic-all/JLogic/target/bp2java
 ln -s $(pwd)/target/bp2java-0.0.1-jar-with-dependencies.jar /home/fabio/Source/JLogic/target/bp2java
+ln -s $(pwd)/target/bp2java-0.0.1-jar-with-dependencies.jar /media/data/Source/JLogic-all/JLogic/target/bp2java
 

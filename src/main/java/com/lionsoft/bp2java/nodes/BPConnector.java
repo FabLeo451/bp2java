@@ -118,7 +118,7 @@ class BPConnector {
         else if (jref.containsKey("object")) {
           // Reference an object
           setFixedOutput((String) jref.get("object"));
-          System.out.println(getLabel()+" references "+fixedOutput);
+          //System.out.println(getLabel()+" references "+fixedOutput);
         }
         else {
           System.out.println("'references' without target object");

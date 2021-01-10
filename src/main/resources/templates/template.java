@@ -1,3 +1,4 @@
+package org.jlogic.program;
 
 import java.util.*;
 
