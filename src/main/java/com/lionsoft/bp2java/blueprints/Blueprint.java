@@ -18,6 +18,7 @@ import org.jgrapht.*;
 import org.jgrapht.graph.*;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.traverse.BreadthFirstIterator;
 
 public class Blueprint {
 /*
@@ -62,6 +63,7 @@ public class Blueprint {
   protected String javaSource;
 
   protected DirectedGraph<BPNode, DefaultEdge> graph;
+  List<Block> blocks = new ArrayList<Block>();
 
   public Blueprint() {
     nodes = new ArrayList<BPNode>();
@@ -453,11 +455,62 @@ public class Blueprint {
     return true;
   }
 
+  /**
+   * Find nodes that start blocks
+   */
+  public void findBlocks() {
+      blocks.add(new Block(entryPointNode));
+
+      BreadthFirstIterator iterator = new BreadthFirstIterator<>(graph);
+      while (iterator.hasNext()) {
+          BPNode node = (BPNode) iterator.next();
+          //System.out.println(node.toString());
+
+          //if (node.branches() || node.getRef() > 1)
+          if (graph.outgoingEdgesOf(node).size() > 1 || graph.incomingEdgesOf(node).size() > 1)
+              blocks.add(new Block(node));
+      }
+
+      for (Block b: blocks) {
+          System.out.println(b.toString());
+      }
+  }
+
+  /**
+   * Assign blocks to all nodes
+   */
+  public void propagateBlocks() {
+      for (Block b: blocks) {
+          BPNode start = b.getStart();
+          start.propagateBlock();
+      }
+  }
+
+  /**
+   * Link blocks
+   */
+  public void linkBlocks() {
+      for (Block b: blocks) {
+          BPNode start = b.getStart();
+
+          if (start.getPrevious() != null) {
+              Block prev = start.getPrevious().get(0).getBlock();
+
+              for (BPNode n: start.getPrevious()) {
+
+              }
+          }
+      }
+  }
+
   public String compile() {
     String /*functionCode,*/ scope, returnType, header, parameters = "", body = "";
 
     if (!checkGraph())
       return null;
+
+    findBlocks();
+    propagateBlocks();
 
     javaSource = "";
 

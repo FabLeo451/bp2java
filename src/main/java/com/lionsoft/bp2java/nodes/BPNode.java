@@ -28,7 +28,7 @@ abstract class BPNode {
   String name;
   int nIn;
   int nOut;
-  int nExec;
+  int nExecOut; // Available exits (includes not connected)
 
   String java = "";
   String nodePath = ".";
@@ -51,7 +51,9 @@ abstract class BPNode {
   private boolean javaInputArray = false;
 
   Boolean compiled = false;         /* Already compiled (to avoid loops) */
+  //int nRef; // Connected exec flows from previous nodes
   Block block;
+  List<BPNode> previous = new ArrayList<BPNode>();
 
   public BPNode() {
     input = new ArrayList<BPConnector>();
@@ -60,7 +62,7 @@ abstract class BPNode {
     //jarList = new ArrayList<String>();
     referenceList = new ArrayList<Reference>();
     includeList = new ArrayList<String>();
-    nExec = 0;
+    nExecOut = 0;
   }
 
   public BPNode(Blueprint blueprint, JSONObject jn) {
@@ -92,10 +94,26 @@ abstract class BPNode {
   public String getName () {
     return (name);
   }
-/*
-  public String getMessage () {
-    return (message);
-  }*/
+
+  //public void ref() { nRef ++; }
+  public int getRef() { return previous.size(); }
+
+  public Block getBlock() { return block; }
+  public void setBlock(Block block) { this.block = block; }
+  public boolean inBlock() { return block != null; }
+
+  public boolean branches() { return nExecOut > 1; }
+
+  public String toString() { return name; }
+
+  public void addPrevious(BPNode node) {
+      if (!previous.contains(node))
+        previous.add(node);
+  }
+
+  public List<BPNode> getPrevious() {
+      return previous;
+  }
 
   public boolean checkConnectors () {
     //System.out.println("Checking "+getName()+ " ("+nIn+" connectors)");
@@ -259,7 +277,7 @@ abstract class BPNode {
       exec.add(null);
 
       if (c.getExec())
-        nExec ++;
+        nExecOut ++;
     }
 
     if (jn.containsKey("java"))
@@ -301,6 +319,16 @@ abstract class BPNode {
   /*public String getIncludedJava() {
     return includedJava != null ? includedJava : "";
   }*/
+    public void propagateBlock() {
+        for (int i=0; i<nOut; i++) {
+            BPConnector c = getOutputConnector(i);
+
+            if (c != null && c.getExec() && c.isConnected()) {
+                if (!c.getNode().inBlock())
+                    c.getNode().setBlock(getBlock());
+            }
+        }
+    }
 
     public abstract String translate();
 
@@ -321,7 +349,7 @@ abstract class BPNode {
         if (!checkConnectors())
           return null;
 
-        // Compile nodesbackwards  where input come from (eg. operators)
+        // Compile nodes backwards where input come from (eg. operators)
         for (int i=0; i<nIn; i++) {
             BPConnector c = getInputConnector(i);
 

@@ -20,8 +20,9 @@ public class BPEntryPoint extends BPNode {
   }
 
   public Block compile() {
-    Block block = new Block(this);
 /*
+    Block block = new Block(this);
+
     if (compiled)
       block.setSourceCode(java);*/
 

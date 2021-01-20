@@ -57,6 +57,8 @@ class BPConnector {
   int referenceId;
   //BPVariable *references;
 
+  Block outBlock;
+
   //static String strTypes[] = {"_exec_", "int", "float", "String", "Boolean"};
 
   public BPConnector() {
@@ -70,7 +72,7 @@ class BPConnector {
 
   public BPConnector(BPNode node, int direction, JSONObject jc) {
     this();
-    
+
     this.node = node;
 
     setId(((Long) jc.get("id")).intValue());
@@ -82,7 +84,7 @@ class BPConnector {
     setDataTypeName((String) jc.get("dataType"));
     setExec((Boolean) jc.get("exec"));
     setDimensions(((Long) jc.get("dimensions")).intValue());
-    
+
     //System.out.println("Connector "+getId()+" "+node.getName()+"."+getLabel());
 
     //type = new BPType((String) jc.get("dataTypeName"));
@@ -162,7 +164,7 @@ class BPConnector {
 
       }
     }
-    
+
     //System.out.println("Created "+this.toString());
   }
 
@@ -172,7 +174,7 @@ class BPConnector {
     varName = "_conn_"+name+"_"+id;
     references = new Reference(decl, varName);
     setFixedOutput(varName);
-    
+
     //System.out.println("Local var: "+decl+" "+varName);
   }
 
@@ -291,6 +293,9 @@ class BPConnector {
 
   public void connectTo(BPConnector c) {
     connectedTo = c;
+
+    if (getExec())
+        c.getNode().addPrevious(getNode());
   }
 
   public BPConnector getConnected() {

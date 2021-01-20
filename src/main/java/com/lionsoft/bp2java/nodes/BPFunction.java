@@ -27,14 +27,15 @@ public class BPFunction extends BPNode {
   public String translate() {
     String code;
 
-    super.getJava();
+    //super.getJava();
 
     // Set exec array
     if (!getSubsequentCode())
         return null;
 
     // Set initial code form node
-    code = java;
+    //code = java;
+    code = "";
 
     //System.out.println("java = "+java);
 
@@ -70,7 +71,7 @@ public class BPFunction extends BPNode {
     if (c != null && c.getExec() && c.isConnected())
       code += c.getConnectedNode().compile();
     */
-    if (nExec == 1) {
+    if (nExecOut == 1) {
       if (exec.get(0) != null)
         code += exec.get(0);
     }
