@@ -77,7 +77,7 @@ public class BPFunction extends BPNode {
     else {
       for (int i=0; i<nOut; i++) {
         BPConnector c = getOutputConnector(i);
-        System.out.println("Connector "+c.getNode().getName()+"."+c.getLabel()+" "+ (c.isConnected() ? "[*]" : "[ ]") +" -> "+exec.get(i));
+        //System.out.println("Connector "+c.getNode().getName()+"."+c.getLabel()+" "+ (c.isConnected() ? "[*]" : "[ ]") +" -> "+exec.get(i));
 
         if (c.getExec()) {
           code = code.replace("exec{"+i+"}", c.isConnected() ? exec.get(i) : "");
