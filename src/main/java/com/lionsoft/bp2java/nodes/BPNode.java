@@ -41,7 +41,7 @@ abstract class BPNode {
   //public List<String> importList;
   //public List<String> jarList;
   public List<String> includeList;
-  
+
   private Blueprint blueprint; // Blueprint fo this node
 
   // Auto-variables referenced by output connectors
@@ -51,7 +51,7 @@ abstract class BPNode {
   private boolean javaInputArray = false;
 
   Boolean compiled = false;         /* Already compiled (to avoid loops) */
-  //String message;
+  Block block;
 
   public BPNode() {
     input = new ArrayList<BPConnector>();
@@ -114,7 +114,7 @@ abstract class BPNode {
     return true;
   }
 
-  public String initCode() {
+  public String getInitialCode() {
     String autoCode = "";
 
     if (type != OPERATOR)
@@ -138,17 +138,17 @@ abstract class BPNode {
     java = autoCode + java;
 
 
-    return (java);
+    return (autoCode);
   }
 
   public String getJava() {
     return (java);
   }
-  
+
   public void setJava(String j) {
     java = j;
   }
-  
+
   public String getDeclare() {
     return (declare);
   }
@@ -158,15 +158,15 @@ abstract class BPNode {
       BPConnector c = getOutputConnector(i);
 
       if (c != null && c.getExec() && c.isConnected()) {
-        String s = c.getConnectedNode().compile();
-        
-        if (s == null)
+        Block b = c.getConnectedNode().compile();
+
+        if (b == null)
           return false;
-          
-        exec.set(i, s);
+
+        exec.set(i, b.getSourceCode());
       }
     }
-    
+
     return true;
   }
 
@@ -197,7 +197,7 @@ abstract class BPNode {
     setId(((Long)jn.get("id")).intValue());
     setName((String) jn.get("name"));
     setType(((Long)jn.get("type")).intValue());
-    
+
     //System.out.println("* Node "+name);
 
     if (jn.containsKey("data")) {
@@ -221,56 +221,11 @@ abstract class BPNode {
       for (int i=0; jinclude != null && i < jinclude.size(); i++) {
         System.out.println("Adding for inclusion: "+(String) jinclude.get(i));
         includeList.add((String) jinclude.get(i));
-        /*String filename = path+"/"+(String)jinclude.get(i);
-
-        System.out.println("Including "+filename);
-
-        try {
-          includedJava = new String (Files.readAllBytes(Paths.get(filename)));
-        } catch (IOException e) {
-          System.err.println("Can't include "+filename+": "+e.getMessage());
-          includedJava = null;
-        }*/
       }
     }
 
     //System.out.println("options.javaInputArray = "+javaInputArray);
-/* 
-    // Now read from blueprint
-    if (jn.containsKey("import")) {
-      JSONArray ja = (JSONArray) jn.get("import");
 
-      for (int i=0; i < ja.size(); i++) {
-        importList.add((String)ja.get(i));
-      }
-    }
-*/
-
-    /*
-    // Done by JLogic when compiling
-    if (jn.containsKey("jar")) {
-      JSONArray ja = (JSONArray) jn.get("jar");
-
-      // If path is present maybe we have "jar":"{path}/jarname.jar"
-      String path = null;
-
-      if (jn.containsKey("data")) {
-        JSONObject jdata = (JSONObject) jn.get("data");
-        path = jdata.containsKey("path") ? (String) jdata.get("path") : null;
-      }
-
-      //System.out.println(getName()+" path: "+path);
-
-      for (int i=0; i < ja.size(); i++) {
-        String jar = (String)ja.get(i);
-
-        if (path != null)
-          jar = jar.replace("{path}", path);
-
-        jarList.add(jar);
-      }
-    }
-    */
 
     JSONArray jConnectorArray = (JSONArray) jn.get("input");
 
@@ -347,36 +302,40 @@ abstract class BPNode {
     return includedJava != null ? includedJava : "";
   }*/
 
-  public abstract String translate();
-  
-  public String compile() {
-    if (compiled)
-      return(java);
-    
-    compiled = true;
+    public abstract String translate();
 
-    //System.out.println("Compiling "+blueprint.getName()+"."+this.name);
-      
-    // Check connectors
-    if (!checkConnectors())
-      return null;
-      
-    // Compile nodes where input come (eg. operators)
-    for (int i=0; i<nIn; i++) {
-      BPConnector c = getInputConnector(i);
-
-      if (!c.getExec() && c.isConnected()) {
-        if (c.getConnected().getNode().compile() == null)
-          return null;
-      }
+    public Block compile() {
+        Block block = new Block(this);
+        return(compile(block));
     }
-    
-    initCode();
 
-    java = translate();
-    
-    
-    
-    return(java);
-  }
+    public Block compile(Block block) {
+        if (compiled)
+            return(block);
+
+        compiled = true;
+
+        //System.out.println("Compiling "+blueprint.getName()+"."+this.name);
+
+        // Check connectors
+        if (!checkConnectors())
+          return null;
+
+        // Compile nodesbackwards  where input come from (eg. operators)
+        for (int i=0; i<nIn; i++) {
+            BPConnector c = getInputConnector(i);
+
+            if (!c.getExec() && c.isConnected()) {
+                if (c.getConnected().getNode().compile() == null)
+                    return null;
+            }
+        }
+
+        block.addSourceCode(getInitialCode());
+        //System.out.println("Initial code: "+block.getSourceCode());
+        block.addSourceCode(translate());
+        //System.out.println("Translated: "+block.getSourceCode());
+
+        return(block);
+    }
 };

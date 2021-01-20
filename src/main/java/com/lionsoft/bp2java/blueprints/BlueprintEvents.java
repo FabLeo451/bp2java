@@ -37,21 +37,21 @@ public class BlueprintEvents extends Blueprint {
   public String compile() {
     String /*functionCode,*/ header, declareSection="", body;
     String begin="", exception="", end="";
-    
+
     javaSource = "";
-    
+
     if (!checkGraph())
       return null;
-    
+
     header = "public static void " + getMethodName() + "(EventType event, String message) throws ExitException ";
 
      for (int k=0; k<locals.size(); k++)
       declareSection += locals.get(k) + System.lineSeparator();
 
-    begin = eventNodes.get(EventType.BEGIN).compile();
-    exception = eventNodes.get(EventType.EXCEPTION).compile();
-    end = eventNodes.get(EventType.END).compile();
-    
+    begin = eventNodes.get(EventType.BEGIN).compile().getSourceCode();
+    exception = eventNodes.get(EventType.EXCEPTION).compile().getSourceCode();
+    end = eventNodes.get(EventType.END).compile().getSourceCode();
+
     if (begin == null || exception == null || end == null)
       return null;
 
@@ -68,9 +68,8 @@ public class BlueprintEvents extends Blueprint {
                    declareSection + System.lineSeparator() +
                    body + System.lineSeparator() +
                    "}" + System.lineSeparator();
-    
+
     return javaSource;
   }
 
 };
-

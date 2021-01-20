@@ -6,12 +6,12 @@ import org.json.simple.JSONObject;
 public class BPEvent extends BPNode {
 
   EventType event;
- 
+
   public BPEvent() {
     super();
     setType (EVENT);
   }
- 
+
   public BPEvent(Blueprint blueprint, JSONObject jo) {
     super(blueprint, jo);
     setType (EVENT);
@@ -22,27 +22,25 @@ public class BPEvent extends BPNode {
   public EventType getEvent() {
     return(event);
   }
-  
-  public String translate() { 
+
+  public String translate() {
     return null;
   }
-  
-  public String compile() {
-    /*if (super.compile() == null)
-      return null;*/
-      
-    if (compiled)
-      return(java);
-      
+
+  public Block compile() {
+    /*if (compiled)
+      return(java);*/
+
     compiled = true;
-    
+
+    Block block = new Block(this);
+
     if (getOutputConnector(0).isConnected())
-      java = getOutputConnector(0).getConnectedNode().compile();
-    else
-      java = "";
-      
-    return(java);
+      return(getOutputConnector(0).getConnectedNode().compile());
+    /*else
+      java = "";*/
+
+    return(block);
   }
 
 };
-

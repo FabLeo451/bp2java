@@ -33,7 +33,7 @@ public class Blueprint {
   public final static int ERR_MUST_CONNECT = 4;
 */
   //int result = SUCCESS;
-    
+
   Code resultCode = Code.SUCCESS;
   String message = "OK";
 
@@ -60,7 +60,7 @@ public class Blueprint {
   protected String declareSection;
   protected String includedJava = "";
   protected String javaSource;
-  
+
   protected DirectedGraph<BPNode, DefaultEdge> graph;
 
   public Blueprint() {
@@ -71,7 +71,7 @@ public class Blueprint {
     locals = new ArrayList<String>();
     name = "myBlueprint";
     method = name;
-    
+
     graph = new DefaultDirectedGraph<>(DefaultEdge.class);
 
     // Standard types
@@ -136,7 +136,7 @@ public class Blueprint {
   public String getMessage() {
     return (message);
   }
-  
+
   public void setResult(Code code, String message) {
     this.resultCode = code;
     this.message = message;
@@ -153,7 +153,7 @@ public class Blueprint {
   public List<BPNode> getNodes() {
     return (nodes);
   }
-  
+
   public void addJar(String jar) {
     if (!jarList.contains(jar))
       jarList.add(jar);
@@ -387,7 +387,7 @@ public class Blueprint {
             System.err.println("Can't include "+filename+": "+e.getMessage());
           }
         }
-        
+
         if (node.getDeclare() != null)
           program.appendToGlobals(node.getDeclare() + System.lineSeparator());
       }
@@ -428,37 +428,37 @@ public class Blueprint {
 
     return (Code.SUCCESS);
   }
-  
+
   public String getJavaSource() {
     return(javaSource);
   }
-  
+
   public boolean checkGraph() {
     // Check if Return node is reachable
     if (entryPointNode != null && returnNode != null) {
       ConnectivityInspector<BPNode, DefaultEdge> ci = new ConnectivityInspector<BPNode, DefaultEdge>(graph);
-      
+
       if (!ci.pathExists(entryPointNode, returnNode))
         System.out.println("Warning: blueprint "+this.name+": Return node not reachable");
     }
-    
+
     // Check cycles
     CycleDetector<BPNode, DefaultEdge> cd = new CycleDetector<BPNode, DefaultEdge>(graph);
- 
+
     if (cd.detectCycles()) {
       setResult(Code.ERR_CYCLES, "Cycle detected");
       return false;
     }
-    
+
     return true;
   }
 
   public String compile() {
     String /*functionCode,*/ scope, returnType, header, parameters = "", body = "";
-    
+
     if (!checkGraph())
       return null;
-    
+
     javaSource = "";
 
     //scope = (getType() == Blueprint.MAIN) ? "public static" : "public";
@@ -501,8 +501,8 @@ public class Blueprint {
     }*/
 
 
-    body = entryPointNode.compile();
-    
+    Block block = entryPointNode.compile();
+
     if (body == null)
       return null;
 
@@ -513,7 +513,7 @@ public class Blueprint {
                       "") +
                    header + " {" + System.lineSeparator() +
                    declareSection + System.lineSeparator() +
-                   body + System.lineSeparator() +
+                   block.getSourceCode() + System.lineSeparator() +
                    //(returnNode.returnsValue() ? returnNode.getCode(): "") +
                    "}" + System.lineSeparator();
 
@@ -527,11 +527,11 @@ public class Blueprint {
   public String getIncludedJava() {
     return includedJava != null ? includedJava : "";
   }
-/*  
+/*
   public void addNodeToGraph(BPNode node) {
     graph.addVertex(node);
   }
-  
+
   public void addEdgeToGraph(BPNode node1, BPNode node2) {
     graph.addEdge(node1, node2);
   }*/
