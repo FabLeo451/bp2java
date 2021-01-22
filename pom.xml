@@ -16,41 +16,51 @@
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-		
+
 <dependency>
     <groupId>gnu.getopt</groupId>
     <artifactId>java-getopt</artifactId>
     <version>1.0.13</version>
 </dependency>
-		
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.13.1</version>
 			<scope>test</scope>
 		</dependency>
-		
+
     <dependency>
       <groupId>com.google.googlejavaformat</groupId>
       <artifactId>google-java-format</artifactId>
       <version>1.7</version>
-    </dependency>		
+    </dependency>
 
+	<!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
+	<dependency>
+	    <groupId>org.jgrapht</groupId>
+	    <artifactId>jgrapht-core</artifactId>
+	    <version>1.5.0</version>
+	</dependency>
+
+
+<!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-ext -->
 <dependency>
     <groupId>org.jgrapht</groupId>
-    <artifactId>jgrapht-core</artifactId>
-    <version>1.0.1</version>
+    <artifactId>jgrapht-ext</artifactId>
+    <version>1.5.0</version>
 </dependency>
-		
+
+
 	</dependencies>
-	
+
 <build>
 	<plugins>
 		<plugin>
@@ -66,11 +76,11 @@
 					<manifestEntries>
 						<Class-Path>.</Class-Path>
 					</manifestEntries>
-					
+
 				</archive>
 			</configuration>
 		</plugin>
-		
+
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>3.2.0</version>
@@ -85,7 +95,7 @@
           </descriptorRefs>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>

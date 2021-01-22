@@ -1,6 +1,7 @@
 package com.lionsoft.bp2java;
 
 import java.util.*;
+import java.io.*;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Files;
@@ -13,28 +14,20 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.Iterator;
+import java.awt.image.BufferedImage;
+import java.awt.Color;
 
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
-import org.jgrapht.alg.ConnectivityInspector;
-import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
+import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.traverse.BreadthFirstIterator;
+import org.jgrapht.ext.JGraphXAdapter;
+import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.util.mxCellRenderer;
 
 public class Blueprint {
-/*
-  public final static int GENERIC = 0;
-  public final static int MAIN = 1;
-  public final static int EVENTS = 2;
-*/
-/*
-  public final static int SUCCESS = 0;
-  public final static int ERR_FILE_NOT_FOUND = 1;
-  public final static int ERR_IO = 2;
-  public final static int ERR_JSON_PARSING = 3;
-  public final static int ERR_MUST_CONNECT = 4;
-*/
-  //int result = SUCCESS;
-
   Code resultCode = Code.SUCCESS;
   String message = "OK";
 
@@ -62,7 +55,7 @@ public class Blueprint {
   protected String includedJava = "";
   protected String javaSource;
 
-  protected DirectedGraph<BPNode, DefaultEdge> graph;
+  protected DefaultDirectedGraph<BPNode, DefaultEdge> graph;
   List<Block> blocks = new ArrayList<Block>();
 
   public Blueprint() {
@@ -580,6 +573,31 @@ public class Blueprint {
   public String getIncludedJava() {
     return includedJava != null ? includedJava : "";
   }
+
+    public boolean createImage(String imageFile) {
+        File imgFile = new File(imageFile);
+/*
+        try {
+            imgFile.createNewFile();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }*/
+/*
+        JGraphXAdapter<String, DefaultEdge> graphAdapter =  new JGraphXAdapter<String, DefaultEdge>(graph);
+        mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
+        layout.execute(graphAdapter.getDefaultParent());*/
+
+        /*
+        JGraphXAdapter<V, E> graphAdapter = new JGraphXAdapter<V, E>(graph);
+        mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
+        layout.execute(graphAdapter.getDefaultParent());
+        BufferedImage image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2, new Color(0f,0f,0f,.5f), true, null);
+        File imgFile = new File(GRAPH_FILE_PATH);
+        imgFile.write(image, "PNG", imgFile);*/
+
+        return true;
+    }
 /*
   public void addNodeToGraph(BPNode node) {
     graph.addVertex(node);
