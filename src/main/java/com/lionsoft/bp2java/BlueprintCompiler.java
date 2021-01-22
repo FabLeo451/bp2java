@@ -174,7 +174,9 @@ public class BlueprintCompiler {
         // Image
         if (imageFile != null) {
             if (program.getBlueprintList().size() > 0 ) {
+                System.out.println("Creating "+imageFile);
                 Blueprint b = program.getBlueprintList().get(0);
+                b.createImage(imageFile);
             }
         }
       }

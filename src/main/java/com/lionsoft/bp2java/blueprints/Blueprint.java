@@ -22,10 +22,10 @@ import org.jgrapht.graph.*;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.traverse.BreadthFirstIterator;
-import org.jgrapht.ext.JGraphXAdapter;
-import com.mxgraph.layout.mxIGraphLayout;
-import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.*;
 import com.mxgraph.util.mxCellRenderer;
+import org.jgrapht.ext.*;
+import javax.imageio.ImageIO;
 
 public class Blueprint {
   Code resultCode = Code.SUCCESS;
@@ -566,16 +566,16 @@ public class Blueprint {
     return javaSource;
   }
 
-  public void setProgram(BPProgram p) {
-    program = p;
-  }
+    public void setProgram(BPProgram p) {
+        program = p;
+    }
 
-  public String getIncludedJava() {
-    return includedJava != null ? includedJava : "";
-  }
+    public String getIncludedJava() {
+        return includedJava != null ? includedJava : "";
+    }
 
     public boolean createImage(String imageFile) {
-        File imgFile = new File(imageFile);
+
 /*
         try {
             imgFile.createNewFile();
@@ -588,13 +588,20 @@ public class Blueprint {
         mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
         layout.execute(graphAdapter.getDefaultParent());*/
 
-        /*
-        JGraphXAdapter<V, E> graphAdapter = new JGraphXAdapter<V, E>(graph);
+
+        JGraphXAdapter<BPNode, DefaultEdge> graphAdapter = new JGraphXAdapter<BPNode, DefaultEdge>(graph);
         mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
         layout.execute(graphAdapter.getDefaultParent());
         BufferedImage image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2, new Color(0f,0f,0f,.5f), true, null);
-        File imgFile = new File(GRAPH_FILE_PATH);
-        imgFile.write(image, "PNG", imgFile);*/
+        File file = new File(imageFile);
+
+        try {
+            ImageIO.write(image, "PNG", file);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+        //ListenableGraph<BPNode, DefaultEdge> g = new DefaultListenableGraph<>(graph);
 
         return true;
     }
