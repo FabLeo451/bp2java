@@ -26,6 +26,8 @@ import com.mxgraph.layout.*;
 import com.mxgraph.util.mxCellRenderer;
 import org.jgrapht.ext.*;
 import javax.imageio.ImageIO;
+import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
+import javax.swing.SwingConstants;
 
 public class Blueprint {
   Code resultCode = Code.SUCCESS;
@@ -55,7 +57,29 @@ public class Blueprint {
   protected String includedJava = "";
   protected String javaSource;
 
-  protected DefaultDirectedGraph<BPNode, DefaultEdge> graph;
+  class RelationshipEdge extends DefaultEdge
+  {
+      private String label;
+
+      public RelationshipEdge(String label)
+      {
+          super();
+          this.label = label;
+      }
+
+      public String getLabel()
+      {
+          return label;
+      }
+
+      @Override
+      public String toString()
+      {
+          return "(" + getSource() + " : " + getTarget() + " : " + label + ")";
+      }
+  }
+
+  protected DefaultDirectedGraph<BPNode, RelationshipEdge> graph;
   List<Block> blocks = new ArrayList<Block>();
 
   public Blueprint() {
@@ -67,7 +91,7 @@ public class Blueprint {
     name = "myBlueprint";
     method = name;
 
-    graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+    graph = new DefaultDirectedGraph<>(RelationshipEdge.class);
 
     // Standard types
     // {"_exec_", "int", "float", "String", "Boolean"};
@@ -412,7 +436,7 @@ public class Blueprint {
       if (c1.getExec()) {
         // Execution flow connection (previous points to next)
         c1.connectTo(c2);
-        graph.addEdge(c1.getNode(), c2.getNode());
+        graph.addEdge(c1.getNode(), c2.getNode(), new RelationshipEdge(c1.getLabel()));
       }
       else {
         // Data connection (next points to previous)
@@ -431,14 +455,14 @@ public class Blueprint {
   public boolean checkGraph() {
     // Check if Return node is reachable
     if (entryPointNode != null && returnNode != null) {
-      ConnectivityInspector<BPNode, DefaultEdge> ci = new ConnectivityInspector<BPNode, DefaultEdge>(graph);
+      ConnectivityInspector<BPNode, RelationshipEdge> ci = new ConnectivityInspector<BPNode, RelationshipEdge>(graph);
 
       if (!ci.pathExists(entryPointNode, returnNode))
         System.out.println("Warning: blueprint "+this.name+": Return node not reachable");
     }
 
     // Check cycles
-    CycleDetector<BPNode, DefaultEdge> cd = new CycleDetector<BPNode, DefaultEdge>(graph);
+    CycleDetector<BPNode, RelationshipEdge> cd = new CycleDetector<BPNode, RelationshipEdge>(graph);
 
     if (cd.detectCycles()) {
       setResult(Code.ERR_CYCLES, "Cycle detected");
@@ -589,10 +613,12 @@ public class Blueprint {
         layout.execute(graphAdapter.getDefaultParent());*/
 
 
-        JGraphXAdapter<BPNode, DefaultEdge> graphAdapter = new JGraphXAdapter<BPNode, DefaultEdge>(graph);
-        mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
+        JGraphXAdapter<BPNode, RelationshipEdge> graphAdapter = new JGraphXAdapter<BPNode, RelationshipEdge>(graph);
+        mxIGraphLayout layout = new mxHierarchicalLayout(graphAdapter);
+        ((mxHierarchicalLayout)layout).setOrientation(SwingConstants.WEST);
         layout.execute(graphAdapter.getDefaultParent());
-        BufferedImage image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2, new Color(0f,0f,0f,.5f), true, null);
+
+        BufferedImage image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2, Color.WHITE, true, null);
         File file = new File(imageFile);
 
         try {
