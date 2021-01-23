@@ -81,6 +81,7 @@ public class Blueprint {
 
   protected DefaultDirectedGraph<BPNode, RelationshipEdge> graph;
   List<Block> blocks = new ArrayList<Block>();
+  Block startBlock;
 
   public Blueprint() {
     nodes = new ArrayList<BPNode>();
@@ -476,16 +477,53 @@ public class Blueprint {
    * Find nodes that start blocks
    */
   public void findBlocks() {
-      blocks.add(new Block(entryPointNode));
+      startBlock = new Block(entryPointNode);
+      blocks.add(startBlock);
 
+      // 1. All branch nodes and their sub graphs start a block
       BreadthFirstIterator iterator = new BreadthFirstIterator<>(graph);
       while (iterator.hasNext()) {
           BPNode node = (BPNode) iterator.next();
           //System.out.println(node.toString());
 
-          //if (node.branches() || node.getRef() > 1)
-          if (graph.outgoingEdgesOf(node).size() > 1 || graph.incomingEdgesOf(node).size() > 1)
-              blocks.add(new Block(node));
+          if (graph.outgoingEdgesOf(node).size() > 1) {
+              /*
+              Block block = null;
+
+              if (node.inBlock())
+                block = node.getBlock();
+              else {
+                  block = new Block(node);
+                  blocks.add(block);
+              }*/
+
+              for (int i=0; i<node.getOutputParamsCount(); i++) {
+                  BPConnector c = node.getOutputConnector(i);
+/*
+                    if (c != null && c.getExec() && c.isConnected()) {
+                        if (c.getConnectedNode().inBlock())
+                            c.getConnectedNode().getBlock().setRoot(block);
+                        else
+                            blocks.add(new Block(c.getConnectedNode(), block));
+                    }*/
+                    blocks.add(new Block(c.getConnectedNode()));
+              }
+          }
+      }
+
+      // 2. All nodes that have more than one exec connected in input start a node
+      iterator = new BreadthFirstIterator<>(graph);
+      while (iterator.hasNext()) {
+          BPNode node = (BPNode) iterator.next();
+
+          if (graph.incomingEdgesOf(node).size() > 1) {
+              if (!node.inBlock())
+                blocks.add(new Block(node));
+
+                // If block has a root, then this block directly follows root
+              /*if (node.getBlock().getRoot() != null)
+                node.getBlock().getRoot().setNext(node.getBlock());*/
+          }
       }
 
       for (Block b: blocks) {
@@ -499,6 +537,7 @@ public class Blueprint {
   public void propagateBlocks() {
       for (Block b: blocks) {
           BPNode start = b.getStart();
+          System.out.println("> Propagating from "+b.toString());
           start.propagateBlock();
       }
   }
@@ -506,6 +545,7 @@ public class Blueprint {
   /**
    * Link blocks
    */
+   /*
   public void linkBlocks() {
       for (Block b: blocks) {
           BPNode start = b.getStart();
@@ -518,6 +558,25 @@ public class Blueprint {
               }
           }
       }
+  }*/
+  int indent = 0;
+  public void printBlock(Block block) {
+      if (block == null)
+        return;
+
+      String spaces = "";
+
+      for (int i=0; i<indent; i++)
+        spaces += " ";
+
+      System.out.println(spaces + "- "+block.toString());
+      indent += 4;
+      for (Block b: block.getBranches()) {
+          printBlock(b);
+      }
+      indent -= 4;
+
+      printBlock(block.getNext());
   }
 
   public String compile() {
@@ -528,6 +587,8 @@ public class Blueprint {
 
     findBlocks();
     propagateBlocks();
+    //entryPointNode.propagateBlock();
+    printBlock(startBlock);
 
     javaSource = "";
 
