@@ -13,7 +13,8 @@ public class BPWhileLoop extends BPNode {
     super(blueprint, jo);
   }
 
-  public String translate() {
+  @Override
+  public String toJava() {
     String code, iteration = "";
 
     BPConnector ci = getOutputConnector(0); // Iteration connector

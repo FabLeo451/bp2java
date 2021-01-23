@@ -22,7 +22,8 @@ public class BPSet extends BPNode {
     return variable;
   }
 
-  public String translate() {
+  @Override
+  public String toJava() {
     String code;
 
     code = variable + " = " + getInputConnector(1).getValueAsString() + ";" + System.lineSeparator();

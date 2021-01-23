@@ -80,7 +80,7 @@ public class Blueprint {
   }
 
   protected DefaultDirectedGraph<BPNode, RelationshipEdge> graph;
-  List<Block> blocks = new ArrayList<Block>();
+  List<Block> blocks;
   Block startBlock;
 
   public Blueprint() {
@@ -473,11 +473,24 @@ public class Blueprint {
     return true;
   }
 
+  public boolean checkNodes() {
+      BreadthFirstIterator iterator = new BreadthFirstIterator<>(graph);
+      while (iterator.hasNext()) {
+          BPNode node = (BPNode) iterator.next();
+
+          if (!node.checkConnectors())
+            return false;
+      }
+
+      return true;
+  }
+
   /**
    * Find nodes that start blocks
    */
-  public void findBlocks() {
-      startBlock = new Block(entryPointNode);
+  public List<Block> findBlocks(BPNode startNode) {
+      List<Block> blocks = new ArrayList<Block>();
+      startBlock = new Block(startNode);
       blocks.add(startBlock);
 
       // 1. All branch nodes and their sub graphs start a block
@@ -487,25 +500,8 @@ public class Blueprint {
           //System.out.println(node.toString());
 
           if (graph.outgoingEdgesOf(node).size() > 1) {
-              /*
-              Block block = null;
-
-              if (node.inBlock())
-                block = node.getBlock();
-              else {
-                  block = new Block(node);
-                  blocks.add(block);
-              }*/
-
               for (int i=0; i<node.getOutputParamsCount(); i++) {
                   BPConnector c = node.getOutputConnector(i);
-/*
-                    if (c != null && c.getExec() && c.isConnected()) {
-                        if (c.getConnectedNode().inBlock())
-                            c.getConnectedNode().getBlock().setRoot(block);
-                        else
-                            blocks.add(new Block(c.getConnectedNode(), block));
-                    }*/
                     blocks.add(new Block(c.getConnectedNode()));
               }
           }
@@ -519,46 +515,27 @@ public class Blueprint {
           if (graph.incomingEdgesOf(node).size() > 1) {
               if (!node.inBlock())
                 blocks.add(new Block(node));
-
-                // If block has a root, then this block directly follows root
-              /*if (node.getBlock().getRoot() != null)
-                node.getBlock().getRoot().setNext(node.getBlock());*/
           }
       }
-
+/*
       for (Block b: blocks) {
           System.out.println(b.toString());
-      }
+      } */
+
+      return blocks;
   }
 
   /**
    * Assign blocks to all nodes
    */
-  public void propagateBlocks() {
+  public void propagateBlocks(List<Block> blocks) {
       for (Block b: blocks) {
           BPNode start = b.getStart();
-          System.out.println("> Propagating from "+b.toString());
+          //System.out.println("> Propagating from "+b.toString());
           start.propagateBlock();
       }
   }
 
-  /**
-   * Link blocks
-   */
-   /*
-  public void linkBlocks() {
-      for (Block b: blocks) {
-          BPNode start = b.getStart();
-
-          if (start.getPrevious() != null) {
-              Block prev = start.getPrevious().get(0).getBlock();
-
-              for (BPNode n: start.getPrevious()) {
-
-              }
-          }
-      }
-  }*/
   int indent = 0;
   public void printBlock(Block block) {
       if (block == null)
@@ -579,16 +556,30 @@ public class Blueprint {
       printBlock(block.getNext());
   }
 
+  public boolean compileBlock(Block block) {
+      if (block == null)
+        return true;
+
+      for (Block b: block.getBranches()) {
+          if (!compileBlock(b))
+            return false;
+      }
+
+      return(compileBlock(block.getNext()));
+  }
+
   public String compile() {
     String /*functionCode,*/ scope, returnType, header, parameters = "", body = "";
 
     if (!checkGraph())
       return null;
 
-    findBlocks();
-    propagateBlocks();
-    //entryPointNode.propagateBlock();
-    printBlock(startBlock);
+    if (!checkNodes())
+        return null;
+
+    blocks = findBlocks(entryPointNode);
+    propagateBlocks(blocks);
+    //printBlock(startBlock);
 
     javaSource = "";
 
@@ -632,7 +623,7 @@ public class Blueprint {
     }*/
 
 
-    Block block = entryPointNode.compile();
+    body = startBlock.toJava();
 
     if (body == null)
       return null;
@@ -644,7 +635,7 @@ public class Blueprint {
                       "") +
                    header + " {" + System.lineSeparator() +
                    declareSection + System.lineSeparator() +
-                   block.getSourceCode() + System.lineSeparator() +
+                   body + System.lineSeparator() +
                    //(returnNode.returnsValue() ? returnNode.getCode(): "") +
                    "}" + System.lineSeparator();
 

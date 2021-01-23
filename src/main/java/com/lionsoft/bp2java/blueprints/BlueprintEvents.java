@@ -43,14 +43,31 @@ public class BlueprintEvents extends Blueprint {
     if (!checkGraph())
       return null;
 
+    if (!checkNodes())
+      return null;
+
+    List<Block> blocksBegin = findBlocks(eventNodes.get(EventType.BEGIN));
+    Block beginBl = startBlock;
+    propagateBlocks(blocksBegin);
+    List<Block> blocksException = findBlocks(eventNodes.get(EventType.EXCEPTION));
+    Block exceptionBl = startBlock;
+    propagateBlocks(blocksException);
+    List<Block> blocksEnd = findBlocks(eventNodes.get(EventType.END));
+    Block endBl = startBlock;
+    propagateBlocks(blocksEnd);
+
     header = "public static void " + getMethodName() + "(EventType event, String message) throws ExitException ";
 
      for (int k=0; k<locals.size(); k++)
       declareSection += locals.get(k) + System.lineSeparator();
-
+/*
     begin = eventNodes.get(EventType.BEGIN).compile().getSourceCode();
     exception = eventNodes.get(EventType.EXCEPTION).compile().getSourceCode();
     end = eventNodes.get(EventType.END).compile().getSourceCode();
+*/
+    begin = beginBl.toJava();
+    exception = exceptionBl.toJava();
+    end = endBl.toJava();
 
     if (begin == null || exception == null || end == null)
       return null;

@@ -116,7 +116,7 @@ abstract class BPNode {
       return previous;
   }
 
-  public boolean checkConnectors () {
+  public boolean checkConnectors() {
     //System.out.println("Checking "+getName()+ " ("+nIn+" connectors)");
 
     for (int i=0; i<nIn; i++) {
@@ -154,7 +154,7 @@ abstract class BPNode {
       }
     }
 
-    java = autoCode + java;
+    //java = autoCode + java;
 
 
     return (autoCode);
@@ -172,7 +172,8 @@ abstract class BPNode {
     return (declare);
   }
 
-  public boolean getSubsequentCode () {
+  // DEPRECATED
+  public boolean getSubsequentCode_old () {
     for (int i=0; i<nOut; i++) {
       BPConnector c = getOutputConnector(i);
 
@@ -183,6 +184,22 @@ abstract class BPNode {
           return false;
 
         exec.set(i, b.getSourceCode());
+      }
+    }
+
+    return true;
+  }
+
+  public boolean getSubsequentCode () {
+    for (int i=0; i<nOut; i++) {
+      BPConnector c = getOutputConnector(i);
+
+      if (c != null && c.getExec() && c.isConnected()) {
+        System.out.println(name+" -> "+c.getConnectedNode().getName());
+        if (c.getConnectedNode().getRef() == 1)
+            exec.set(i, c.getConnectedNode().toJava());
+        else
+            exec.set(i, "");
       }
     }
 
@@ -282,7 +299,7 @@ abstract class BPNode {
     }
 
     if (jn.containsKey("java"))
-      java += (String) jn.get("java");
+      java = (String) jn.get("java");
     /*else
       System.out.println("Warning: node '"+getName()+"' has no Java code");*/
 
@@ -361,13 +378,15 @@ abstract class BPNode {
         }
     }
 
-    public abstract String translate();
+    public String translate() { return ""; }
 
+    // DEPRECATED
     public Block compile() {
         Block block = new Block(this);
         return(compile(block));
     }
 
+    // DEPRECATED
     public Block compile(Block block) {
         if (compiled)
             return(block);
@@ -396,5 +415,57 @@ abstract class BPNode {
         //System.out.println("Translated: "+block.getSourceCode());
 
         return(block);
+    }
+
+    public String toJava() {
+        System.out.println("Translating "+getName());
+        String actualSource = getInitialCode();
+        actualSource += java; // Add original code to be processed
+
+        // Set java code on exec exits
+        if (!getSubsequentCode())
+            return null;
+
+        actualSource = actualSource.replace("{node.id}", Integer.toString(getId()));
+        actualSource = actualSource.replace("{count.in}", Integer.toString(nIn));
+
+        // Replace code of input values
+        for (int i=0; i<nIn; i++) {
+          BPConnector c = getInputConnector(i);
+
+          if (!c.getExec()) {
+            actualSource = actualSource.replace("in{"+i+"}", c.getValueAsString());
+          }
+        }
+
+        // Replace code of output variables (out{2} = 5 -> _code_6 = 5;)
+        for (int i=0; i<nOut; i++) {
+          BPConnector c = getOutputConnector(i);
+
+          if (!c.getExec()) {
+            actualSource = actualSource.replace("out{"+i+"}", c.getValueAsString());
+          }
+        }
+
+        actualSource += System.lineSeparator();
+
+        if (nExecOut == 1) {
+          if (exec.get(0) != null)
+            actualSource += exec.get(0);
+            System.out.println(" exec.get(0) = "+ exec.get(0));
+
+        }
+        else {
+          for (int i=0; i<nOut; i++) {
+            BPConnector c = getOutputConnector(i);
+            //System.out.println("Connector "+c.getNode().getName()+"."+c.getLabel()+" "+ (c.isConnected() ? "[*]" : "[ ]") +" -> "+exec.get(i));
+
+            if (c.getExec()) {
+              actualSource = actualSource.replace("exec{"+i+"}", c.isConnected() ? exec.get(i) : "");
+            }
+          }
+        }
+
+        return actualSource;
     }
 };

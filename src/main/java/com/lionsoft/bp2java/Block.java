@@ -49,7 +49,7 @@ public class Block {
     public List<Block> getBranches() { return branches; }
     public void addBranch(Block block) {
         if (!branches.contains(block))
-            branches.add(block); 
+            branches.add(block);
     }
 
     public void append(Block b) { addSourceCode(b.getSourceCode()); }
@@ -57,4 +57,16 @@ public class Block {
     public BPNode getStart() { return start; }
 
     public String toString() { return "Block [id="+id+", start="+start.getName()+", root="+(root != null ? root.start.getName() : "")+"]"; }
+
+    public String toJava() {
+        if (start == null)
+            return "";
+
+        sourceCode = start.toJava();
+
+        if (next != null)
+            sourceCode += next.getStart().toJava();
+
+        return(sourceCode);
+    }
 };
