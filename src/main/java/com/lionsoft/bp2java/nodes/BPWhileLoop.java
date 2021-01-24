@@ -11,8 +11,10 @@ public class BPWhileLoop extends BPNode {
 
   public BPWhileLoop(Blueprint blueprint, JSONObject jo) {
     super(blueprint, jo);
-  }
 
+
+  }
+/*
   @Override
   public String toJava() {
     String code, iteration = "";
@@ -33,6 +35,7 @@ public class BPWhileLoop extends BPNode {
 
     return code;
   }
+  */
 /*
   public String compile() {
     if (super.compile() == null)

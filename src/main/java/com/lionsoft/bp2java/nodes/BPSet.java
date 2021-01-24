@@ -16,14 +16,19 @@ public class BPSet extends BPNode {
 
     variable = getInputConnector(1).getLabel();
     getOutputConnector(1).setFixedOutput(variable);
+
+    java = variable + " = " + getInputConnector(1).getValueAsString() + ";" + System.lineSeparator();
+    //java += "exec{0}" + System.lineSeparator();
+
   }
 
   public String getVariable() {
     return variable;
   }
-
+/*
   @Override
   public String toJava() {
+
     String code;
 
     code = variable + " = " + getInputConnector(1).getValueAsString() + ";" + System.lineSeparator();
@@ -34,7 +39,10 @@ public class BPSet extends BPNode {
       code += c.getConnectedNode().compile().getSourceCode();
 
     return code;
+
+    return(super.toJava());
   }
+  */
 /*
   public String compile() {
     if (super.compile() == null)

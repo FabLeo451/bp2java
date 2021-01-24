@@ -502,6 +502,8 @@ public class Blueprint {
           if (graph.outgoingEdgesOf(node).size() > 1) {
               for (int i=0; i<node.getOutputParamsCount(); i++) {
                   BPConnector c = node.getOutputConnector(i);
+
+                  if (c.isConnected())
                     blocks.add(new Block(c.getConnectedNode()));
               }
           }
@@ -571,13 +573,17 @@ public class Blueprint {
   public String compile() {
     String /*functionCode,*/ scope, returnType, header, parameters = "", body = "";
 
+    System.out.println("Compiling blueprint "+name+"...");
+
     if (!checkGraph())
       return null;
 
     if (!checkNodes())
         return null;
 
+    System.out.println("Finding blocks...");
     blocks = findBlocks(entryPointNode);
+    System.out.println("Propagating blocks...");
     propagateBlocks(blocks);
     //printBlock(startBlock);
 

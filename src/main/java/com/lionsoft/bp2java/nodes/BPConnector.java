@@ -365,10 +365,12 @@ class BPConnector {
           else if (getNode().getType() == BPNode.GET)
             result = ((BPGet)getNode()).getVariableName();
           else if (getNode().getType() == BPNode.OPERATOR)
-            result = getNode().getJava();
+            //result = getNode().getJava();
+            result = getNode().toJava();
           else {
             if (direction == BPConnector.INPUT && isConnected())
-              result = getNode().getJava();
+              //result = getNode().getJava();
+              result = getNode().toJava();
           }
         }
       }

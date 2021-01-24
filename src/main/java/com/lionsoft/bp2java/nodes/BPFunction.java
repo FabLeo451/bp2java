@@ -24,6 +24,7 @@ public class BPFunction extends BPNode {
     java = j;
   }
   */
+  /*
   public String translate() {
     String code;
 
@@ -65,12 +66,7 @@ public class BPFunction extends BPNode {
     }
 
     code += System.lineSeparator();
-    /*
-    BPConnector c = getOutputConnector(0);
 
-    if (c != null && c.getExec() && c.isConnected())
-      code += c.getConnectedNode().compile();
-    */
     if (nExecOut == 1) {
       if (exec.get(0) != null)
         code += exec.get(0);
@@ -88,6 +84,7 @@ public class BPFunction extends BPNode {
 
     return code;
   }
+  */
  /*
   public String compile() {
     System.out.println("Compiling node "+this.name);

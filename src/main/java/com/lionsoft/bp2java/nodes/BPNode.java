@@ -173,6 +173,7 @@ abstract class BPNode {
   }
 
   // DEPRECATED
+  /*
   public boolean getSubsequentCode_old () {
     for (int i=0; i<nOut; i++) {
       BPConnector c = getOutputConnector(i);
@@ -189,13 +190,13 @@ abstract class BPNode {
 
     return true;
   }
-
+*/
   public boolean getSubsequentCode () {
     for (int i=0; i<nOut; i++) {
       BPConnector c = getOutputConnector(i);
 
       if (c != null && c.getExec() && c.isConnected()) {
-        System.out.println(name+" -> "+c.getConnectedNode().getName());
+        //System.out.println(name+" -> "+c.getConnectedNode().getName());
         if (c.getConnectedNode().getRef() == 1)
             exec.set(i, c.getConnectedNode().toJava());
         else
@@ -338,6 +339,8 @@ abstract class BPNode {
     return includedJava != null ? includedJava : "";
   }*/
     public void propagateBlock() {
+        //System.out.println("  Propagating block from "+toString());
+
         // Iterate all exits
         for (int i=0; i<nOut; i++) {
             BPConnector c = getOutputConnector(i);
@@ -418,7 +421,7 @@ abstract class BPNode {
     }
 
     public String toJava() {
-        System.out.println("Translating "+getName());
+        //System.out.println("Translating "+getName());
         String actualSource = getInitialCode();
         actualSource += java; // Add original code to be processed
 
@@ -434,6 +437,7 @@ abstract class BPNode {
           BPConnector c = getInputConnector(i);
 
           if (!c.getExec()) {
+            //System.out.println("  Input data "+i);
             actualSource = actualSource.replace("in{"+i+"}", c.getValueAsString());
           }
         }
@@ -452,7 +456,7 @@ abstract class BPNode {
         if (nExecOut == 1) {
           if (exec.get(0) != null)
             actualSource += exec.get(0);
-            System.out.println(" exec.get(0) = "+ exec.get(0));
+            //System.out.println(" exec.get(0) = "+ exec.get(0));
 
         }
         else {
