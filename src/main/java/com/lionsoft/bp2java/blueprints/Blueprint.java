@@ -519,10 +519,6 @@ public class Blueprint {
                 blocks.add(new Block(node));
           }
       }
-/*
-      for (Block b: blocks) {
-          System.out.println(b.toString());
-      } */
 
       return blocks;
   }
@@ -536,7 +532,46 @@ public class Blueprint {
           //System.out.println("> Propagating from "+b.toString());
           start.propagateBlock();
       }
+/*
+      for (Block b: blocks) {
+          System.out.println(b.toString());
+      }*/
   }
+
+  /**
+   * Set followers
+   */
+    public void linkBlocks(List<Block> blocks) {
+        for (Block b: blocks) {
+            if (b.getIncoming().size() > 0) {
+                if (b.getIncoming().size() == 1)
+                    b.getIncoming().get(0).setNext(b);
+                else {
+                    for (int i=0; i<b.getIncoming().size(); i++) {
+                        boolean link = true;
+                        Block in = b.getIncoming().get(i);
+                        //System.out.println("Examinating "+in.toString());
+
+                        for (int k=0; k<b.getIncoming().size(); k++) {
+                            if (in == b.getIncoming().get(k))
+                                continue;
+
+                            //System.out.println("  Comparing with "+b.getIncoming().get(k).toString()+" : "+in.isDescendantOf(b.getIncoming().get(k)));
+                            if (in.isDescendantOf(b.getIncoming().get(k))) {
+                                //System.out.println(in.toString()+" descends of "+b.getIncoming().get(k).toString());
+                                link = false;
+                                break;
+                            }
+                        }
+
+                        if (link) {
+                            in.setNext(b);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
   int indent = 0;
   public void printBlock(Block block) {
@@ -555,7 +590,10 @@ public class Blueprint {
       }
       indent -= 4;
 
-      printBlock(block.getNext());
+      if (block.getNext() != null) {
+          System.out.println("Next:");
+          printBlock(block.getNext());
+      }
   }
 
   public boolean compileBlock(Block block) {
@@ -573,7 +611,7 @@ public class Blueprint {
   public String compile() {
     String /*functionCode,*/ scope, returnType, header, parameters = "", body = "";
 
-    System.out.println("Compiling blueprint "+name+"...");
+    //System.out.println("Compiling blueprint "+name+"...");
 
     if (!checkGraph())
       return null;
@@ -581,11 +619,12 @@ public class Blueprint {
     if (!checkNodes())
         return null;
 
-    System.out.println("Finding blocks...");
+    //System.out.println("Finding blocks...");
     blocks = findBlocks(entryPointNode);
-    System.out.println("Propagating blocks...");
+    //System.out.println("Propagating blocks...");
     propagateBlocks(blocks);
     //printBlock(startBlock);
+    linkBlocks(blocks);
 
     javaSource = "";
 

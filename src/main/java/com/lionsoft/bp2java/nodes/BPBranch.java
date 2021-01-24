@@ -13,7 +13,7 @@ public class BPBranch extends BPNode {
     super(blueprint, jo);
     setType (BPNode.BRANCH);
   }
-
+/*
   public String translate() {
     String code, bt = "", bf = "";
 
@@ -35,7 +35,7 @@ public class BPBranch extends BPNode {
     code += bf + System.lineSeparator() + "}" + System.lineSeparator();
 
     return code;
-  }
+}*/
 /*
   public String compile() {
     if (super.compile() == null)

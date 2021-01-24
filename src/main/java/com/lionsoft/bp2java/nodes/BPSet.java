@@ -17,7 +17,7 @@ public class BPSet extends BPNode {
     variable = getInputConnector(1).getLabel();
     getOutputConnector(1).setFixedOutput(variable);
 
-    java = variable + " = " + getInputConnector(1).getValueAsString() + ";" + System.lineSeparator();
+    java = variable + " = in{1};" + System.lineSeparator();
     //java += "exec{0}" + System.lineSeparator();
 
   }

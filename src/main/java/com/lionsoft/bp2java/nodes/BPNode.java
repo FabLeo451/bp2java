@@ -197,8 +197,12 @@ abstract class BPNode {
 
       if (c != null && c.getExec() && c.isConnected()) {
         //System.out.println(name+" -> "+c.getConnectedNode().getName());
-        if (c.getConnectedNode().getRef() == 1)
-            exec.set(i, c.getConnectedNode().toJava());
+        if (c.getConnectedNode().getRef() == 1) {
+            if (c.getConnectedNode().getBlock() == block)
+                exec.set(i, c.getConnectedNode().toJava());
+            else
+                exec.set(i, c.getConnectedNode().getBlock().toJava());
+        }
         else
             exec.set(i, "");
       }
@@ -357,9 +361,10 @@ abstract class BPNode {
                     connected.propagateBlock();
                 } else {
                     if (branches()) {
+                        //block.setBranchNode(this);
                         // Start of a block
                         //System.out.println(connected.getName()+ " starts a block ref = "+connected.getRef());
-                        connected.getBlock().setRoot(this.getBlock());
+                        connected.getBlock().setRoot(this.getBlock(), this);
 
                         //System.out.println("  Found branch "+connected.getBlock().toString());
 
@@ -369,12 +374,28 @@ abstract class BPNode {
                             getBlock().addBranch(connected.getBlock());
                         }
                         else {
-                                getBlock().setNext(connected.getBlock());
+                                //getBlock().setNext(connected.getBlock());
+                                connected.getBlock().addIncoming(this.block);
 
                         }
                     } else {
-                        if (this.getBlock().getRoot() != null)
-                            this.getBlock().getRoot().setNext(connected.getBlock());
+                        if (this.getBlock().getRoot() != null) {
+                            //System.out.println(" Branch "+this.getBlock().getRootNode().getName()+" type = "+this.getBlock().getRootNode().getType());
+                            if (this.getBlock().getRootNode().getType() == BPNode.SEQUENCE)
+                                this.getBlock().setNext(connected.getBlock());
+                            else {
+                                /*
+                                if (connected.getBlock().getPrev() != null && connected.getBlock().getPrev().isDescendantOf(block)) {
+                                    connected.getBlock().getPrev().setNext(null);
+                                }
+
+                                if (!this.block.followedByRecurs(connected.getBlock()))
+                                    this.getBlock().getRoot().setNext(connected.getBlock());
+                                    */
+                                connected.getBlock().addIncoming(this.block.getRoot() != null ? this.block.getRoot() : this.block);
+
+                            }
+                        }
                     }
                 }
             }
