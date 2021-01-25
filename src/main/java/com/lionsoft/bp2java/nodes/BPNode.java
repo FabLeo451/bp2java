@@ -36,6 +36,7 @@ abstract class BPNode {
 
   List<BPConnector> input;
   List<BPConnector> output;
+  List<BPConnector> execConnectors;
   List<String> exec;
 
   //public List<String> importList;
@@ -59,6 +60,7 @@ abstract class BPNode {
   public BPNode() {
     input = new ArrayList<BPConnector>();
     output = new ArrayList<BPConnector>();
+    execConnectors = new ArrayList<BPConnector>();
     //importList = new ArrayList<String>(); // Now read from blueprint
     //jarList = new ArrayList<String>();
     referenceList = new ArrayList<Reference>();
@@ -299,8 +301,10 @@ abstract class BPNode {
       // Initializze every exec item to null. Will be filled in BPNode.getSubsequentCode()
       exec.add(null);
 
-      if (c.getExec())
+      if (c.getExec()) {
+        execConnectors.add(c);
         nExecOut ++;
+      }
     }
 
     if (jn.containsKey("java"))
@@ -360,8 +364,8 @@ abstract class BPNode {
                     connected.setBlock(getBlock());
                     connected.propagateBlock();
                 } else {
+                    // Follower is already in a block
                     if (branches()) {
-                        //block.setBranchNode(this);
                         // Start of a block
                         //System.out.println(connected.getName()+ " starts a block ref = "+connected.getRef());
                         connected.getBlock().setRoot(this.getBlock(), this);
@@ -379,29 +383,42 @@ abstract class BPNode {
 
                         }
                     } else {
-                        if (this.getBlock().getRoot() != null) {
-                            //System.out.println(" Branch "+this.getBlock().getRootNode().getName()+" type = "+this.getBlock().getRootNode().getType());
-                            if (this.getBlock().getRootNode().getType() == BPNode.SEQUENCE)
-                                this.getBlock().setNext(connected.getBlock());
-                            else {
-                                /*
-                                if (connected.getBlock().getPrev() != null && connected.getBlock().getPrev().isDescendantOf(block)) {
-                                    connected.getBlock().getPrev().setNext(null);
+                        Block root = this.getBlock().getRoot();
+
+                        if (root != null) {
+                            // Check if every branch of branchNode brings to connected
+                            BPNode branch = this.block.getBranchNode();
+                            //System.out.println("Branch "+branch.toString());
+
+                            boolean allBringTo = true;
+
+                            for (BPConnector exc: execConnectors) {
+                                if (exc.isConnected()) {
+                                    BPNode n = exc.getConnectedNode();
+
+                                    if (!blueprint.nodeReaches(n, connected)) {
+                                        allBringTo = false;
+                                        break;
+                                    }
                                 }
-
-                                if (!this.block.followedByRecurs(connected.getBlock()))
-                                    this.getBlock().getRoot().setNext(connected.getBlock());
-                                    */
-                                connected.getBlock().addIncoming(this.block.getRoot() != null ? this.block.getRoot() : this.block);
-
                             }
-                        }
+
+                            if (/*this.getBlock().getBranchNode().getType() == BPNode.SEQUENCE ||
+                                this.getBlock().getBranchNode().getType() == BPNode.SWITCH_INTEGER*/
+                                !allBringTo)
+                                this.block.setNext(connected.getBlock());
+                            else {
+                                connected.getBlock().addIncoming(this.block.getRoot() != null ? this.block.getRoot() : this.block);
+                            }
+                        } /*else {
+                            this.block.setNext(connected.getBlock());
+                        }*/
                     }
                 }
             }
         }
     }
-
+/*
     public String translate() { return ""; }
 
     // DEPRECATED
@@ -440,7 +457,7 @@ abstract class BPNode {
 
         return(block);
     }
-
+*/
     public String toJava() {
         //System.out.println("Translating "+getName());
         String actualSource = getInitialCode();
@@ -468,6 +485,7 @@ abstract class BPNode {
           BPConnector c = getOutputConnector(i);
 
           if (!c.getExec()) {
+            //System.out.println("Node "+name+" out{"+i+"}");
             actualSource = actualSource.replace("out{"+i+"}", c.getValueAsString());
           }
         }

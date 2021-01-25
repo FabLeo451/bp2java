@@ -14,11 +14,11 @@ public class BPBlueprint extends BPFunction {
     super();
     setType (BPNode.BLUEPRINT);
   }
-  
+
   public BPBlueprint(Blueprint blueprint, JSONObject jo) {
     super(blueprint, jo);
     setType (BPNode.BLUEPRINT);
-    
+
     //method = (String) jo.get("method");
     blueprintId = (String) jo.get("blueprintId");
     blueprintInternalId = ((Long) jo.get("blueprintInternalId")).intValue();
@@ -27,55 +27,53 @@ public class BPBlueprint extends BPFunction {
 
     if (returns())
       javaCode += "out{1} = ";
-   
+
     javaCode += "{method}(";
-    
+
     int nParams = 0;
-    
+
     for (int i=0; i<nIn; i++) {
       BPConnector c = getInputConnector(i);
 
       if (!c.getExec()) {
         if (nParams > 0)
           javaCode += ", ";
-          
+
         javaCode += "in{"+i+"}";
         nParams ++;
       }
     }
-    
+
     javaCode += ");";
- 
+
     if (returns()) {
       BPConnector returnConn = getOutputConnector(1);
       //System.out.println("BPBlueprint: "+returnConn.toString());
       returnConn.createReferenceLocalVariable (returnConn.getDataTypeName() + (returnConn.getDimensions() == 0 ? "" : "[]"), "bp_out");
       referenceList.add(new Reference(returnConn.getDataTypeName() + (returnConn.getDimensions() == 0 ? "" : "[]"), returnConn.getFixedOutput()));
     }
-    
+
     setJava(javaCode);
   }
-  
+
   public void setBlueprintList(List<Blueprint> l) {
     blueprintList = l;
   }
 
-  public String translate() {
-    String source = super.translate();
-    
+  public String toJava() {
+    //String source = super.translate();
+
     // Search the blueprint to be called by internal id
-    
+
     for (Blueprint b: blueprintList) {
       //System.out.println(blueprintId+" -> "+b.getId()+" "+b.getMethodName());
-      
+
       if (b.getInternalId() == blueprintInternalId) {
-        source = source.replace("{method}", b.getMethodName());
+        java = java.replace("{method}", b.getMethodName());
         break;
       }
     }
-    
-    return (source);
+
+    return (super.toJava());
   }
 };
-
-

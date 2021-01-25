@@ -22,14 +22,12 @@ public class BPEvent extends BPNode {
   public EventType getEvent() {
     return(event);
   }
-
+/*
   public String translate() {
     return null;
   }
 
   public Block compile() {
-    /*if (compiled)
-      return(java);*/
 
     compiled = true;
 
@@ -37,10 +35,8 @@ public class BPEvent extends BPNode {
 
     if (getOutputConnector(0).isConnected())
       return(getOutputConnector(0).getConnectedNode().compile());
-    /*else
-      java = "";*/
 
     return(block);
   }
-
+*/
 };

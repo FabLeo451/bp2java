@@ -596,6 +596,11 @@ public class Blueprint {
       }
   }
 
+  public boolean nodeReaches(BPNode from, BPNode to) {
+      ConnectivityInspector<BPNode, RelationshipEdge> ci = new ConnectivityInspector<BPNode, RelationshipEdge>(graph);
+      return(ci.pathExists(from, to));
+  }
+
   public boolean compileBlock(Block block) {
       if (block == null)
         return true;

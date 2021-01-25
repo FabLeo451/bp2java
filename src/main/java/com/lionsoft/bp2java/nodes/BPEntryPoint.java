@@ -14,26 +14,20 @@ public class BPEntryPoint extends BPNode {
     super(blueprint, jo);
     setType (ENTRY_POINT);
   }
-
+/*
   public String translate() {
     return null;
   }
 
   public Block compile() {
-/*
-    Block block = new Block(this);
-
-    if (compiled)
-      block.setSourceCode(java);*/
 
     compiled = true;
 
     if (getOutputConnector(0).isConnected())
       return(getOutputConnector(0).getConnectedNode().compile());
-    /*else
-      java = "";*/
+
 
     return(block);
   }
-
+*/
 };

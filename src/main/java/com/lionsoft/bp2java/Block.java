@@ -58,7 +58,7 @@ public class Block {
         branchNode = n;
     }
 
-    public BPNode getRootNode() {
+    public BPNode getBranchNode() {
         return branchNode;
     }
     public void setRootNode(BPNode n) {
