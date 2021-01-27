@@ -1,6 +1,7 @@
 package org.jlogic.program;
 
 import java.util.*;
+import java.io.*;
 
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
@@ -156,6 +157,19 @@ public class {className} {
 
     if (context == null)
       context = new BPContext();
+
+    try {
+        InputStream input = org.jlogic.program.{className}.class.getResourceAsStream("/application.properties");
+
+        if (input != null) {
+            Properties p = new Properties();
+            p.load(input);
+            input.close();
+            context.setProgramProperties("application.properties", p);
+        }
+    } catch (Exception ex) {
+        ex.printStackTrace();
+    }
   }
 
   /**
