@@ -57,7 +57,7 @@ class BPConnector {
   int referenceId;
   //BPVariable *references;
 
-  Block outBlock;
+  //Block outBlock;
 
   //static String strTypes[] = {"_exec_", "int", "float", "String", "Boolean"};
 

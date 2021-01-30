@@ -43,21 +43,6 @@ class ExecutionTree {
 
         if (edges.size() == 0)
             return;
-/*
-        if (edges.size() == 1) {
-            ExecNode node = new ExecNode((BPNode) it.next().getTarget());
-            //System.out.println("Added "+node.toString());
-            tree.addVertex(node);
-            tree.addEdge(start, node, new RelationshipEdge());
-            go(node);
-        } else {
-            while (it.hasNext()) {
-                ExecNode node = new ExecNode((BPNode) it.next().getTarget());
-                tree.addVertex(node);
-                tree.addEdge(start, node, new RelationshipEdge());
-                go(node);
-            }
-        }*/
 
         while (it.hasNext()) {
             RelationshipEdge edge = it.next();

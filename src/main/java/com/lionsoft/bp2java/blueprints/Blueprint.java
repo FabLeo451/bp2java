@@ -59,8 +59,8 @@ public class Blueprint {
   protected String javaSource;
 
   protected DefaultDirectedGraph<BPNode, RelationshipEdge> graph;
-  List<Block> blocks; // DEPRECATED
-  Block startBlock; // DEPRECATED
+  //List<Block> blocks; // DEPRECATED
+  //Block startBlock; // DEPRECATED
 
   public Blueprint() {
     nodes = new ArrayList<BPNode>();
@@ -468,6 +468,7 @@ public class Blueprint {
   /**
    * Find nodes that start blocks
    */
+   /*
   public List<Block> findBlocks(BPNode startNode) {
       List<Block> blocks = new ArrayList<Block>();
       startBlock = new Block(startNode);
@@ -504,25 +505,24 @@ public class Blueprint {
 
       return blocks;
   }
-
+*/
   /**
    * Assign blocks to all nodes
    */
+   /*
   public void propagateBlocks(List<Block> blocks) {
       for (Block b: blocks) {
           BPNode start = b.getStart();
           //System.out.println("> Propagating from "+b.toString());
           start.propagateBlock();
       }
-/*
-      for (Block b: blocks) {
-          System.out.println(b.toString());
-      }*/
-  }
+
+  }*/
 
   /**
    * Set followers
    */
+   /*
     public void linkBlocks(List<Block> blocks) {
         for (Block b: blocks) {
             if (b.getIncoming().size() > 0) {
@@ -555,7 +555,8 @@ public class Blueprint {
             }
         }
     }
-
+*/
+/*
   int indent = 0;
   public void printBlock(Block block) {
       if (block == null)
@@ -578,12 +579,12 @@ public class Blueprint {
       indent -= 4;
 
   }
-
+*/
   public boolean nodeReaches(BPNode from, BPNode to) {
       ConnectivityInspector<BPNode, RelationshipEdge> ci = new ConnectivityInspector<BPNode, RelationshipEdge>(graph);
       return(ci.pathExists(from, to));
   }
-
+/*
   public boolean allBranchesBringTo(BPNode start, BPNode target) {
       boolean startIsBranch = start.getType() != BPNode.SEQUENCE || start.getType() != BPNode.SWITCH_INTEGER;
 
@@ -601,8 +602,8 @@ public class Blueprint {
       }
 
       return true;
-  }
-
+  }*/
+/*
   public boolean compileBlock(Block block) {
       if (block == null)
         return true;
@@ -614,7 +615,7 @@ public class Blueprint {
 
       return(compileBlock(block.getNext()));
   }
-
+*/
   public String compile() {
     String /*functionCode,*/ scope, returnType, header, parameters = "", body = "";
 
@@ -634,7 +635,7 @@ public class Blueprint {
     printBlock(startBlock);
     */
     ExecutionTree execTree = new ExecutionTree(graph, entryPointNode);
-    execTree.print();
+    //execTree.print();
 
     javaSource = "";
 

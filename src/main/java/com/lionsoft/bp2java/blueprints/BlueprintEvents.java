@@ -45,7 +45,7 @@ public class BlueprintEvents extends Blueprint {
 
     if (!checkNodes())
       return null;
-
+/*
     List<Block> blocksBegin = findBlocks(eventNodes.get(EventType.BEGIN));
     Block beginBl = startBlock;
     propagateBlocks(blocksBegin);
@@ -55,6 +55,10 @@ public class BlueprintEvents extends Blueprint {
     List<Block> blocksEnd = findBlocks(eventNodes.get(EventType.END));
     Block endBl = startBlock;
     propagateBlocks(blocksEnd);
+*/
+    ExecutionTree beginTree = new ExecutionTree(graph, eventNodes.get(EventType.BEGIN));
+    ExecutionTree exceptionTree = new ExecutionTree(graph, eventNodes.get(EventType.EXCEPTION));
+    ExecutionTree endTree = new ExecutionTree(graph, eventNodes.get(EventType.END));
 
     header = "public static void " + getMethodName() + "(EventType event, String message) throws ExitException ";
 
@@ -65,9 +69,9 @@ public class BlueprintEvents extends Blueprint {
     exception = eventNodes.get(EventType.EXCEPTION).compile().getSourceCode();
     end = eventNodes.get(EventType.END).compile().getSourceCode();
 */
-    begin = beginBl.toJava();
-    exception = exceptionBl.toJava();
-    end = endBl.toJava();
+    begin = beginTree.toJava();
+    exception = exceptionTree.toJava();
+    end = endTree.toJava();
 
     if (begin == null || exception == null || end == null)
       return null;

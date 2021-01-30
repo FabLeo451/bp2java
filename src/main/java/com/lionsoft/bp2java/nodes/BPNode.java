@@ -53,9 +53,9 @@ abstract class BPNode {
 
   Boolean compiled = false;         /* Already compiled (to avoid loops) */
   //int nRef; // Connected exec flows from previous nodes
-  Block block;
+  //Block block;
   List<BPNode> previous = new ArrayList<BPNode>();
-  public boolean startsBlock = false;
+  //public boolean startsBlock = false;
 
   public BPNode() {
     input = new ArrayList<BPConnector>();
@@ -100,11 +100,11 @@ abstract class BPNode {
 
   //public void ref() { nRef ++; }
   public int getRef() { return previous.size(); }
-
+/*
   public Block getBlock() { return block; }
   public void setBlock(Block block) { this.block = block; }
   public boolean inBlock() { return block != null; }
-
+*/
   public void setExec(int i, String source) {
       exec.set(i, source);
   }
@@ -381,6 +381,7 @@ public boolean getSubsequentCode () {
   /*public String getIncludedJava() {
     return includedJava != null ? includedJava : "";
   }*/
+  /*
     public void propagateBlock() {
         //System.out.println("  Propagating block from "+toString());
 
@@ -393,8 +394,8 @@ public boolean getSubsequentCode () {
                 BPNode connected = c.getConnectedNode();
 
                 // If following node doesn't start a block, propagate
-                //if (!connected.inBlock() /*&& !connected.startsBlock*/) {
-                if (!connected.inBlock() /*&& !connected.startsBlock*/) {
+                //if (!connected.inBlock() ) {
+                if (!connected.inBlock() ) {
                     // Propagate
                     connected.setBlock(getBlock());
                     connected.propagateBlock();
@@ -435,14 +436,13 @@ public boolean getSubsequentCode () {
                                 System.out.println("All branches of "+branch.toString()+" bring to "+connected.toString());
                                 //connected.getBlock().addIncoming(this.block.getRoot() != null ? this.block.getRoot() : this.block);
                             }
-                        } /*else {
-                            this.block.setNext(connected.getBlock());
-                        }*/
+                        }
                     }
                 }
             }
         }
     }
+    */
 /*
     public String translate() { return ""; }
 
