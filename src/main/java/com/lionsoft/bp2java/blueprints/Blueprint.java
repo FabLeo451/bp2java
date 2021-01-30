@@ -425,6 +425,18 @@ public class Blueprint {
       }
     }
 
+    // Add null nodes. Useful in execution tree reduction
+    for (BPNode node : nodes) {
+      for (BPConnector c : node.getExecConnectors()) {
+          if (!c.isConnected()) {
+              NullNode nullNode = new NullNode();
+              c.connectTo(nullNode.getInputConnector());
+              graph.addVertex(nullNode);
+              graph.addEdge(node, nullNode, new RelationshipEdge(c.getLabel(), c));
+          }
+      }
+    }
+
     return (Code.SUCCESS);
   }
 

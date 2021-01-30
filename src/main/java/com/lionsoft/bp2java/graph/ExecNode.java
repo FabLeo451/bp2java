@@ -33,11 +33,11 @@ class ExecNode {
         Iterator<RelationshipEdge> it = edges.iterator();
         while (it.hasNext()) {
             RelationshipEdge edge = it.next();
-            //System.out.println(node.getName()+"  Connector "+ (edge.getConnector() != null ? edge.getConnector().getIndex() : "null"));
+            System.out.println(node.getName()+"  Connector "+ (edge.getConnector() != null ? edge.getConnector().getIndex() : "null"));
             if (edge.getConnector() != null) {
                 int i = edge.getConnector().getIndex();
                 ExecNode branch = (ExecNode) edge.getTarget();
-                //System.out.println("  Getting Java from "+branch.toString());
+                System.out.println("  Getting Java from "+branch.toString());
                 node.setExec(i, branch.toJava());
             }
         }

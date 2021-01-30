@@ -6,20 +6,21 @@ import org.json.simple.JSONObject;
 
 abstract class BPNode {
 
-  public final static int ENTRY_POINT = 0;
-  public final static int RETURN = 1;
-  public final static int SEQUENCE = 2;
-  public final static int BRANCH = 3;
-  public final static int FUNCTION = 4;
-  public final static int OPERATOR = 5;
-  public final static int GET = 6;
-  public final static int SET = 7;
-  public final static int BLUEPRINT = 8;
-  public final static int FOR_LOOP = 9;
-  public final static int EXIT = 10;
-  public final static int SWITCH_INTEGER = 12;
-  public final static int WHILE_LOOP = 13;
-  public final static int EVENT = 14;
+    public final static int NULL_NODE = -1;
+    public final static int ENTRY_POINT = 0;
+    public final static int RETURN = 1;
+    public final static int SEQUENCE = 2;
+    public final static int BRANCH = 3;
+    public final static int FUNCTION = 4;
+    public final static int OPERATOR = 5;
+    public final static int GET = 6;
+    public final static int SET = 7;
+    public final static int BLUEPRINT = 8;
+    public final static int FOR_LOOP = 9;
+    public final static int EXIT = 10;
+    public final static int SWITCH_INTEGER = 12;
+    public final static int WHILE_LOOP = 13;
+    public final static int EVENT = 14;
 
   int id;
   int type;
@@ -34,9 +35,9 @@ abstract class BPNode {
   String nodePath = ".";
   String declare = null;
 
-  List<BPConnector> input;
-  List<BPConnector> output;
-  List<BPConnector> execConnectors;
+  List<BPConnector> input = new ArrayList<BPConnector>();
+  List<BPConnector> output = new ArrayList<BPConnector>();
+  List<BPConnector> execConnectors = new ArrayList<BPConnector>();
   List<String> exec;
 
   //public List<String> importList;
@@ -58,9 +59,9 @@ abstract class BPNode {
   //public boolean startsBlock = false;
 
   public BPNode() {
-    input = new ArrayList<BPConnector>();
-    output = new ArrayList<BPConnector>();
-    execConnectors = new ArrayList<BPConnector>();
+    //input = new ArrayList<BPConnector>();
+    //output = new ArrayList<BPConnector>();
+    //execConnectors = new ArrayList<BPConnector>();
     //importList = new ArrayList<String>(); // Now read from blueprint
     //jarList = new ArrayList<String>();
     referenceList = new ArrayList<Reference>();
