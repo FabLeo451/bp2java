@@ -39,7 +39,7 @@ public class BPOperator extends BPNode {
       for (int i=0; i<nIn; i++) {
         BPConnector c = getInputConnector(i);
 
-        if (!c.getExec()) {
+        if (!c.isExec()) {
           code = code.replace("in{"+i+"}", c.getValueAsString());
         }
       }

@@ -259,12 +259,20 @@ class BPConnector {
     this.exec = exec;
   }
 
-  public Boolean getExec () {
+  public Boolean isExec () {
     return (exec);
   }
 
+  public Boolean isData () {
+    return (!exec);
+  }
+
+  public int getIndex() {
+      return(node.getConnectorIndex(this));
+  }
+
   public boolean mustBeConnected() {
-    return (!getExec() && getValue() == null && !getNullable());
+    return (isData() && getValue() == null && !getNullable());
   }
 
   public void setNullable (Boolean b) {
@@ -294,7 +302,7 @@ class BPConnector {
   public void connectTo(BPConnector c) {
     connectedTo = c;
 
-    if (getExec())
+    if (isExec())
         c.getNode().addPrevious(getNode());
   }
 

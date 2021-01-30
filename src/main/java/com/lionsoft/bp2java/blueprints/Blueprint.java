@@ -22,6 +22,7 @@ import org.jgrapht.graph.*;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.traverse.BreadthFirstIterator;
+import org.jgrapht.traverse.DepthFirstIterator;
 import com.mxgraph.layout.*;
 import com.mxgraph.util.mxCellRenderer;
 import org.jgrapht.ext.*;
@@ -57,31 +58,9 @@ public class Blueprint {
   protected String includedJava = "";
   protected String javaSource;
 
-  class RelationshipEdge extends DefaultEdge
-  {
-      private String label;
-
-      public RelationshipEdge(String label)
-      {
-          super();
-          this.label = label;
-      }
-
-      public String getLabel()
-      {
-          return label;
-      }
-
-      @Override
-      public String toString()
-      {
-          return "(" + getSource() + " : " + getTarget() + " : " + label + ")";
-      }
-  }
-
   protected DefaultDirectedGraph<BPNode, RelationshipEdge> graph;
-  List<Block> blocks;
-  Block startBlock;
+  List<Block> blocks; // DEPRECATED
+  Block startBlock; // DEPRECATED
 
   public Blueprint() {
     nodes = new ArrayList<BPNode>();
@@ -434,10 +413,10 @@ public class Blueprint {
       c1 = getConnectorById (from);
       c2 = getConnectorById (to);
 
-      if (c1.getExec()) {
+      if (c1.isExec()) {
         // Execution flow connection (previous points to next)
         c1.connectTo(c2);
-        graph.addEdge(c1.getNode(), c2.getNode(), new RelationshipEdge(c1.getLabel()));
+        graph.addEdge(c1.getNode(), c2.getNode(), new RelationshipEdge(c1.getLabel(), c1));
       }
       else {
         // Data connection (next points to previous)
@@ -485,6 +464,7 @@ public class Blueprint {
       return true;
   }
 
+
   /**
    * Find nodes that start blocks
    */
@@ -493,23 +473,21 @@ public class Blueprint {
       startBlock = new Block(startNode);
       blocks.add(startBlock);
 
-      // 1. All branch nodes and their sub graphs start a block
+      // 1. All branches of a node start a block
       BreadthFirstIterator iterator = new BreadthFirstIterator<>(graph);
       while (iterator.hasNext()) {
           BPNode node = (BPNode) iterator.next();
           //System.out.println(node.toString());
 
           if (graph.outgoingEdgesOf(node).size() > 1) {
-              for (int i=0; i<node.getOutputParamsCount(); i++) {
-                  BPConnector c = node.getOutputConnector(i);
-
+              for (BPConnector c : node.getExecConnectors()) {
                   if (c.isConnected())
                     blocks.add(new Block(c.getConnectedNode()));
               }
           }
       }
 
-      // 2. All nodes that have more than one exec connected in input start a node
+      // 2. All nodes that have more than one exec connected in input start a block
       iterator = new BreadthFirstIterator<>(graph);
       while (iterator.hasNext()) {
           BPNode node = (BPNode) iterator.next();
@@ -518,6 +496,10 @@ public class Blueprint {
               if (!node.inBlock())
                 blocks.add(new Block(node));
           }
+      }
+
+      for (Block b: blocks) {
+          System.out.println("Found block "+b.toString());
       }
 
       return blocks;
@@ -550,13 +532,13 @@ public class Blueprint {
                     for (int i=0; i<b.getIncoming().size(); i++) {
                         boolean link = true;
                         Block in = b.getIncoming().get(i);
-                        //System.out.println("Examinating "+in.toString());
+                        System.out.println("Examinating "+in.toString());
 
                         for (int k=0; k<b.getIncoming().size(); k++) {
                             if (in == b.getIncoming().get(k))
                                 continue;
 
-                            //System.out.println("  Comparing with "+b.getIncoming().get(k).toString()+" : "+in.isDescendantOf(b.getIncoming().get(k)));
+                            System.out.println("  Comparing with "+b.getIncoming().get(k).toString()+" : "+in.isDescendantOf(b.getIncoming().get(k)));
                             if (in.isDescendantOf(b.getIncoming().get(k))) {
                                 //System.out.println(in.toString()+" descends of "+b.getIncoming().get(k).toString());
                                 link = false;
@@ -565,6 +547,7 @@ public class Blueprint {
                         }
 
                         if (link) {
+                            System.out.println(in.toString()+" -> "+b.toString());
                             in.setNext(b);
                         }
                     }
@@ -588,17 +571,36 @@ public class Blueprint {
       for (Block b: block.getBranches()) {
           printBlock(b);
       }
-      indent -= 4;
-
       if (block.getNext() != null) {
-          System.out.println("Next:");
+          System.out.println(spaces + "Next:");
           printBlock(block.getNext());
       }
+      indent -= 4;
+
   }
 
   public boolean nodeReaches(BPNode from, BPNode to) {
       ConnectivityInspector<BPNode, RelationshipEdge> ci = new ConnectivityInspector<BPNode, RelationshipEdge>(graph);
       return(ci.pathExists(from, to));
+  }
+
+  public boolean allBranchesBringTo(BPNode start, BPNode target) {
+      boolean startIsBranch = start.getType() != BPNode.SEQUENCE || start.getType() != BPNode.SWITCH_INTEGER;
+
+      for (BPConnector exc: start.getExecConnectors()) {
+          if (exc.isConnected()) {
+              BPNode n = exc.getConnectedNode();
+
+              if (!nodeReaches(n, target)) {
+                  return false;
+              }
+          } else {
+              if (startIsBranch)
+                return false;
+          }
+      }
+
+      return true;
   }
 
   public boolean compileBlock(Block block) {
@@ -623,13 +625,16 @@ public class Blueprint {
 
     if (!checkNodes())
         return null;
-
+/*
     //System.out.println("Finding blocks...");
     blocks = findBlocks(entryPointNode);
     //System.out.println("Propagating blocks...");
     propagateBlocks(blocks);
-    //printBlock(startBlock);
     linkBlocks(blocks);
+    printBlock(startBlock);
+    */
+    ExecutionTree execTree = new ExecutionTree(graph, entryPointNode);
+    execTree.print();
 
     javaSource = "";
 
@@ -673,7 +678,7 @@ public class Blueprint {
     }*/
 
 
-    body = startBlock.toJava();
+    body = execTree.toJava();
 
     if (body == null)
       return null;

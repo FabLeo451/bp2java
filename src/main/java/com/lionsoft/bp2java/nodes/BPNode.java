@@ -105,9 +105,22 @@ abstract class BPNode {
   public void setBlock(Block block) { this.block = block; }
   public boolean inBlock() { return block != null; }
 
+  public void setExec(int i, String source) {
+      exec.set(i, source);
+  }
+
+  public int getConnectorIndex(BPConnector c) {
+      for (int i=0; i<nOut; i++) {
+          if (getOutputConnector(i) == c)
+            return(i);
+      }
+
+      return(-1);
+  }
+
   public boolean branches() { return nExecOut > 1; }
 
-  public String toString() { return name; }
+  public String toString() { return "BPNode [id="+id+" name="+name+"]"; }
 
   public void addPrevious(BPNode node) {
       if (!previous.contains(node))
@@ -149,7 +162,7 @@ abstract class BPNode {
       for (int i=0; i<nIn; i++) {
         BPConnector c = getInputConnector(i);
 
-        if (c.getExec())
+        if (c.isExec())
           autoCode += a+"["+i+"] = null;"+ System.lineSeparator();
         else
           autoCode += a+"["+i+"] = "+c.getValueAsString()+";" + System.lineSeparator();
@@ -180,7 +193,7 @@ abstract class BPNode {
     for (int i=0; i<nOut; i++) {
       BPConnector c = getOutputConnector(i);
 
-      if (c != null && c.getExec() && c.isConnected()) {
+      if (c != null && c.isExec() && c.isConnected()) {
         Block b = c.getConnectedNode().compile();
 
         if (b == null)
@@ -193,25 +206,39 @@ abstract class BPNode {
     return true;
   }
 */
-  public boolean getSubsequentCode () {
-    for (int i=0; i<nOut; i++) {
-      BPConnector c = getOutputConnector(i);
+/*
+public boolean getSubsequentCode_Blocks () {
+  for (int i=0; i<nOut; i++) {
+    BPConnector c = getOutputConnector(i);
 
-      if (c != null && c.getExec() && c.isConnected()) {
-        //System.out.println(name+" -> "+c.getConnectedNode().getName());
-        if (c.getConnectedNode().getRef() == 1) {
-            if (c.getConnectedNode().getBlock() == block)
-                exec.set(i, c.getConnectedNode().toJava());
-            else
-                exec.set(i, c.getConnectedNode().getBlock().toJava());
-        }
-        else
-            exec.set(i, "");
+    if (c != null && c.isExec() && c.isConnected()) {
+      //System.out.println(name+" -> "+c.getConnectedNode().getName());
+      if (c.getConnectedNode().getRef() == 1) {
+          if (c.getConnectedNode().getBlock() == block)
+              exec.set(i, c.getConnectedNode().toJava());
+          else
+              exec.set(i, c.getConnectedNode().getBlock().toJava());
       }
+      else
+          exec.set(i, "");
     }
-
-    return true;
   }
+
+  return true;
+}*/
+
+public boolean getSubsequentCode () {
+  for (int i=0; i<nOut; i++) {
+    BPConnector c = getOutputConnector(i);
+
+    if (c != null && c.isExec() && c.isConnected()) {
+      //System.out.println(name+" -> "+c.getConnectedNode().getName());
+          exec.set(i, c.getConnectedNode().toJava());
+    }
+  }
+
+  return true;
+}
 
   public int getInputParamsCount() {
     return (nIn);
@@ -221,13 +248,17 @@ abstract class BPNode {
     return (nOut);
   }
 
+  public int getExitsCount() {
+    return (nExecOut);
+  }
+
   public boolean returns() {
     int n = 0;
 
     for (int i=0; i<nOut; i++) {
       BPConnector c = getOutputConnector(i);
 
-      if (!c.getExec())
+      if (!c.isExec())
         n ++;
     }
 
@@ -301,7 +332,7 @@ abstract class BPNode {
       // Initializze every exec item to null. Will be filled in BPNode.getSubsequentCode()
       exec.add(null);
 
-      if (c.getExec()) {
+      if (c.isExec()) {
         execConnectors.add(c);
         nExecOut ++;
       }
@@ -321,6 +352,10 @@ abstract class BPNode {
 
   public BPConnector getOutputConnector(int position) {
     return (position < nOut ? output.get(position) : null);
+  }
+
+  public List<BPConnector> getExecConnectors() {
+    return (execConnectors);
   }
 
   public BPConnector getConnectorById(int id) {
@@ -353,7 +388,7 @@ abstract class BPNode {
         for (int i=0; i<nOut; i++) {
             BPConnector c = getOutputConnector(i);
 
-            if (c != null && c.getExec() && c.isConnected()) {
+            if (c != null && c.isExec() && c.isConnected()) {
                 // Connected
                 BPNode connected = c.getConnectedNode();
 
@@ -367,15 +402,15 @@ abstract class BPNode {
                     // Follower is already in a block
                     if (branches()) {
                         // Start of a block
-                        //System.out.println(connected.getName()+ " starts a block ref = "+connected.getRef());
-                        connected.getBlock().setRoot(this.getBlock(), this);
+                        System.out.println(connected.getName()+ " starts a block ref = "+connected.getRef());
+                        connected.block.setRoot(this.getBlock(), this);
 
                         //System.out.println("  Found branch "+connected.getBlock().toString());
 
                         if (connected.getRef() == 1) {
                             // One only input. the block follows current
                             //System.out.println(block.toString()+" -> "+connected.getBlock().toString());
-                            getBlock().addBranch(connected.getBlock());
+                            block.addBranch(connected.getBlock());
                         }
                         else {
                                 //getBlock().setNext(connected.getBlock());
@@ -390,25 +425,15 @@ abstract class BPNode {
                             BPNode branch = this.block.getBranchNode();
                             //System.out.println("Branch "+branch.toString());
 
-                            boolean allBringTo = true;
+                            connected.getBlock().addIncoming(this.block.getRoot() != null ? this.block.getRoot() : this.block);
 
-                            for (BPConnector exc: execConnectors) {
-                                if (exc.isConnected()) {
-                                    BPNode n = exc.getConnectedNode();
-
-                                    if (!blueprint.nodeReaches(n, connected)) {
-                                        allBringTo = false;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (/*this.getBlock().getBranchNode().getType() == BPNode.SEQUENCE ||
-                                this.getBlock().getBranchNode().getType() == BPNode.SWITCH_INTEGER*/
-                                !allBringTo)
+                            if (!blueprint.allBranchesBringTo(branch, connected)) {
+                                System.out.println("Not all branches of "+branch.toString()+" bring to "+connected.toString());
                                 this.block.setNext(connected.getBlock());
+                            }
                             else {
-                                connected.getBlock().addIncoming(this.block.getRoot() != null ? this.block.getRoot() : this.block);
+                                System.out.println("All branches of "+branch.toString()+" bring to "+connected.toString());
+                                //connected.getBlock().addIncoming(this.block.getRoot() != null ? this.block.getRoot() : this.block);
                             }
                         } /*else {
                             this.block.setNext(connected.getBlock());
@@ -444,7 +469,7 @@ abstract class BPNode {
         for (int i=0; i<nIn; i++) {
             BPConnector c = getInputConnector(i);
 
-            if (!c.getExec() && c.isConnected()) {
+            if (!c.isExec() && c.isConnected()) {
                 if (c.getConnected().getNode().compile() == null)
                     return null;
             }
@@ -464,8 +489,9 @@ abstract class BPNode {
         actualSource += java; // Add original code to be processed
 
         // Set java code on exec exits
+        /*
         if (!getSubsequentCode())
-            return null;
+            return null;*/
 
         actualSource = actualSource.replace("{node.id}", Integer.toString(getId()));
         actualSource = actualSource.replace("{count.in}", Integer.toString(nIn));
@@ -474,7 +500,7 @@ abstract class BPNode {
         for (int i=0; i<nIn; i++) {
           BPConnector c = getInputConnector(i);
 
-          if (!c.getExec()) {
+          if (!c.isExec()) {
             //System.out.println("  Input data "+i);
             actualSource = actualSource.replace("in{"+i+"}", c.getValueAsString());
           }
@@ -484,14 +510,14 @@ abstract class BPNode {
         for (int i=0; i<nOut; i++) {
           BPConnector c = getOutputConnector(i);
 
-          if (!c.getExec()) {
+          if (!c.isExec()) {
             //System.out.println("Node "+name+" out{"+i+"}");
             actualSource = actualSource.replace("out{"+i+"}", c.getValueAsString());
           }
         }
 
         actualSource += System.lineSeparator();
-
+/*
         if (nExecOut == 1) {
           if (exec.get(0) != null)
             actualSource += exec.get(0);
@@ -503,9 +529,22 @@ abstract class BPNode {
             BPConnector c = getOutputConnector(i);
             //System.out.println("Connector "+c.getNode().getName()+"."+c.getLabel()+" "+ (c.isConnected() ? "[*]" : "[ ]") +" -> "+exec.get(i));
 
-            if (c.getExec()) {
-              actualSource = actualSource.replace("exec{"+i+"}", c.isConnected() ? exec.get(i) : "");
+            if (c.isExec()) {
+              actualSource = actualSource.replace("exec{"+i+"}", c.isConnected() ? (exec.get(i) != null ? exec.get(i) : ""): "");
             }
+          }
+        }
+*/
+
+        if (getExitsCount() == 1)
+          actualSource += "exec{0}";
+
+        for (int i=0; i<nOut; i++) {
+          BPConnector c = getOutputConnector(i);
+          //System.out.println("Connector "+c.getNode().getName()+"."+c.getLabel()+" "+ (c.isConnected() ? "[*]" : "[ ]") +" -> "+exec.get(i));
+
+          if (c.isExec()) {
+            actualSource = actualSource.replace("exec{"+i+"}", c.isConnected() ? (exec.get(i) != null ? exec.get(i) : ""): "");
           }
         }
 

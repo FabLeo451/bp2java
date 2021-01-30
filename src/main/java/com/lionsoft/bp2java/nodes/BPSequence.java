@@ -21,7 +21,7 @@ public class BPSequence extends BPNode {
       for (int i=0; i<nOut; i++) {
         BPConnector c = getOutputConnector(i);
 
-        if (c.getExec() && c.isConnected()) {
+        if (c.isExec() && c.isConnected()) {
           java += "exec{"+i+"}" + System.lineSeparator();
         }
       }
@@ -41,7 +41,7 @@ public class BPSequence extends BPNode {
     for (int i=0; i<nOut; i++) {
       BPConnector c = getOutputConnector(i);
 
-      if (c.getExec() && c.isConnected()) {
+      if (c.isExec() && c.isConnected()) {
         code += exec.get(i);
         code += System.lineSeparator();
       }
