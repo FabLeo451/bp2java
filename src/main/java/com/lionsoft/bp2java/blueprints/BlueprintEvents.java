@@ -56,9 +56,9 @@ public class BlueprintEvents extends Blueprint {
     Block endBl = startBlock;
     propagateBlocks(blocksEnd);
 */
-    ExecutionTree beginTree = new ExecutionTree(graph, eventNodes.get(EventType.BEGIN));
-    ExecutionTree exceptionTree = new ExecutionTree(graph, eventNodes.get(EventType.EXCEPTION));
-    ExecutionTree endTree = new ExecutionTree(graph, eventNodes.get(EventType.END));
+    ExecutionTree beginTree = new ExecutionTree(this, eventNodes.get(EventType.BEGIN));
+    ExecutionTree exceptionTree = new ExecutionTree(this, eventNodes.get(EventType.EXCEPTION));
+    ExecutionTree endTree = new ExecutionTree(this, eventNodes.get(EventType.END));
 
     header = "public static void " + getMethodName() + "(EventType event, String message) throws ExitException ";
 

@@ -19,25 +19,29 @@ class ExecutionTree {
     protected DefaultDirectedGraph<ExecNode, RelationshipEdge> tree;
     DefaultDirectedGraph<BPNode, RelationshipEdge> graph;
     int indent = 0;
-
+/*
     public ExecutionTree(DefaultDirectedGraph<BPNode, RelationshipEdge> graph, BPNode startNode) {
       fromGraph(graph, startNode);
+    }
+*/
+    public ExecutionTree(Blueprint blueprint, BPNode startNode) {
+      fromBlueprint(blueprint, startNode);
     }
 
     ExecNode getRoot() {
       return root;
     }
-
+/*
     public void fromGraph(DefaultDirectedGraph<BPNode, RelationshipEdge> graph, BPNode startNode) {
       tree = new DefaultDirectedGraph<>(RelationshipEdge.class);
       root = new ExecNode(this, startNode);
       tree.addVertex(root);
       this.graph = graph;
 
-      go(root);
+      goGraph(root);
     }
 
-    public void go(ExecNode start) {
+    public void goGraph(ExecNode start) {
         Set<RelationshipEdge> edges = graph.outgoingEdgesOf(start.getNode());
         Iterator<RelationshipEdge> it = edges.iterator();
 
@@ -49,6 +53,29 @@ class ExecutionTree {
             ExecNode node = new ExecNode(this, (BPNode) edge.getTarget(), edge.getConnector());
             tree.addVertex(node);
             tree.addEdge(start, node, new RelationshipEdge(edge.getConnector()));
+            go(node);
+        }
+    }
+*/
+    public void fromBlueprint(Blueprint blueprint, BPNode startNode) {
+      tree = new DefaultDirectedGraph<>(RelationshipEdge.class);
+      root = new ExecNode(this, startNode);
+      tree.addVertex(root);
+      this.graph = graph;
+
+      go(root);
+    }
+
+    public void go(ExecNode start) {
+        List<BPConnector> exec = start.getNode().getExecConnectors();
+
+        if (exec.size() == 0)
+            return;
+
+        for (BPConnector c: exec) {
+            ExecNode node = new ExecNode(this, c.getConnectedNode(), c);
+            tree.addVertex(node);
+            tree.addEdge(start, node, new RelationshipEdge(c));
             go(node);
         }
     }

@@ -121,7 +121,7 @@ abstract class BPNode {
 
   public boolean branches() { return nExecOut > 1; }
 
-  public String toString() { return "BPNode [id="+id+" name="+name+"]"; }
+  public String toString() { return id+" "+name; }
 
   public void addPrevious(BPNode node) {
       if (!previous.contains(node))

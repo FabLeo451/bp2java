@@ -646,7 +646,8 @@ public class Blueprint {
     linkBlocks(blocks);
     printBlock(startBlock);
     */
-    ExecutionTree execTree = new ExecutionTree(graph, entryPointNode);
+    //ExecutionTree execTree = new ExecutionTree(graph, entryPointNode);
+    ExecutionTree execTree = new ExecutionTree(this, entryPointNode);
     //execTree.print();
 
     javaSource = "";
