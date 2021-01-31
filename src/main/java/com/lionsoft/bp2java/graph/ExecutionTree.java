@@ -125,6 +125,14 @@ class ExecutionTree {
         }
     }
 
+    public void attachFollows(ExecNode parent, ExecNode child) {
+        RelationshipEdge followsEdge = new RelationshipEdge();
+        followsEdge.setType(RelationshipEdge.FOLLOWS);
+        followsEdge.setLabel("FOLLOWS");
+        tree.addEdge(parent, child, followsEdge);
+        System.out.println(parent.getNode().toString()+" -> " + child.getNode().toString());
+    }
+
     /**
      * Reduce the tree
      */
@@ -147,11 +155,14 @@ class ExecutionTree {
             }
 
             // Attach new parent node to one tail with an edge of type FOLLOWS
+            /*
             RelationshipEdge followsEdge = new RelationshipEdge();
             followsEdge.setType(RelationshipEdge.FOLLOWS);
             followsEdge.setLabel("FOLLOWS");
             tree.addEdge(result.getNewParent(), result.getStartNodes().get(0), followsEdge);
             System.out.println(result.getNewParent().getNode().toString()+" -> " + result.getStartNodes().get(0).getNode().toString());
+*/
+            attachFollows(result.getNewParent(), result.getStartNodes().get(0));
         }
 
         System.out.println("Reductions: " + n);

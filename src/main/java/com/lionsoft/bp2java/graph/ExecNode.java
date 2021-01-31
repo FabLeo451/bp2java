@@ -60,21 +60,57 @@ class ExecNode {
         return(node.toJava() + follows);
     }
 
-    /**
-     * Reduce the subtree starting at this node
-     */
-    public ReductionResult reduce() {
-        // Reduce children
+    public RelationshipEdge getEdgeByConnector(BPConnector c) {
         Set<RelationshipEdge> edges = tree.getOutgoinEdges(this);
         Iterator<RelationshipEdge> it = edges.iterator();
 
         while (it.hasNext()) {
             RelationshipEdge edge = it.next();
-            ExecNode child = (ExecNode) edge.getTarget();
-            ReductionResult r = child.reduce();
+
+            if (edge.getConnector() == c)
+                return edge;
+        }
+
+        return null;
+    }
+
+    /**
+     * Reduce the subtree starting at this node
+     */
+    public ReductionResult reduce() {
+        // Nodes with an iteration connector (For and While loop) must be treated separately
+        if (node.getType() == BPNode.WHILE_LOOP) {
+            RelationshipEdge edgeIter = getEdgeByConnector(node.getOutputConnector(0));
+            ExecNode startIter = (ExecNode) edgeIter.getTarget();
+            ReductionResult r = startIter.reduce();
 
             if (r.hasReduction())
                 return r;
+
+            RelationshipEdge edgeCompl = getEdgeByConnector(node.getOutputConnector(1));
+
+            if (edgeCompl != null) {
+                ExecNode startCompl = (ExecNode) edgeCompl.getTarget();
+                //return(completedIter.reduce());
+
+                tree.detach(startCompl);
+                tree.attachFollows(this, startCompl);
+            }
+        } else if (node.getType() == BPNode.FOR_LOOP) {
+
+        } else {
+            // Reduce children
+            Set<RelationshipEdge> edges = tree.getOutgoinEdges(this);
+            Iterator<RelationshipEdge> it = edges.iterator();
+
+            while (it.hasNext()) {
+                RelationshipEdge edge = it.next();
+                ExecNode child = (ExecNode) edge.getTarget();
+                ReductionResult r = child.reduce();
+
+                if (r.hasReduction())
+                    return r;
+            }
         }
 
         // Get sequences of this node
