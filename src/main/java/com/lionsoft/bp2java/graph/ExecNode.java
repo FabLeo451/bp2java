@@ -115,7 +115,7 @@ class ExecNode {
 
         // Get sequences of this node
         List<List<ExecNode>> sequences = getSequences();
-
+/*
         System.out.println("- "+node.toString());
 
         for (List<ExecNode> seq: sequences) {
@@ -127,12 +127,12 @@ class ExecNode {
 
             System.out.println(s);
         }
-
+*/
         // Search common tail
         List<ExecNode> startNodes = findCommonTail(sequences);
 
         if (startNodes != null && startNodes.size() > 0) {
-            System.out.println("  Found common tail starting at "+startNodes.get(0).getNode().toString());
+            //System.out.println("  Found common tail starting at "+startNodes.get(0).getNode().toString());
 
             return(new ReductionResult(this, startNodes));
         }
@@ -239,7 +239,7 @@ class ExecNode {
 
                 ExecNode t = targetSeq.get(i);
 
-                System.out.println(m.getNode() +" "+ t.getNode() +": "+(m.getNode() != t.getNode()));
+                //System.out.println(m.getNode() +" "+ t.getNode() +": "+(m.getNode() != t.getNode()));
 
                 if (m.getNode() != t.getNode()){
                     all = false;

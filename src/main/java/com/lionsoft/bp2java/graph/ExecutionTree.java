@@ -85,7 +85,7 @@ class ExecutionTree {
         for (BPConnector c: exec) {
             ExecNode node = new ExecNode(this, c.getConnectedNode(), c);
             tree.addVertex(node);
-            tree.addEdge(start, node, new RelationshipEdge(c));
+            tree.addEdge(start, node, new RelationshipEdge(c.getLabel(), c));
             go(node);
         }
     }
@@ -130,7 +130,7 @@ class ExecutionTree {
         followsEdge.setType(RelationshipEdge.FOLLOWS);
         followsEdge.setLabel("FOLLOWS");
         tree.addEdge(parent, child, followsEdge);
-        System.out.println(parent.getNode().toString()+" -> " + child.getNode().toString());
+        //System.out.println(parent.getNode().toString()+" -> " + child.getNode().toString());
     }
 
     /**
@@ -139,7 +139,7 @@ class ExecutionTree {
     public void reduce() {
         int n = 0;
 
-        saveAsImage("/media/data/Source/JLogic-all/tree-before.png");
+        //saveAsImage("/media/data/Source/JLogic-all/tree-before.png");
 
         while(true) {
             ReductionResult result = root.reduce();
@@ -165,8 +165,8 @@ class ExecutionTree {
             attachFollows(result.getNewParent(), result.getStartNodes().get(0));
         }
 
-        System.out.println("Reductions: " + n);
-        saveAsImage("/media/data/Source/JLogic-all/tree.png");
+        //System.out.println("Reductions: " + n);
+        //saveAsImage("/media/data/Source/JLogic-all/tree.png");
     }
 
     /**
