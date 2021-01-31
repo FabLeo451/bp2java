@@ -536,18 +536,23 @@ public boolean getSubsequentCode () {
           }
         }
 */
-
+/*
         if (getExitsCount() == 1)
           actualSource += "exec{0}";
+*/
+          if (getExitsCount() == 1) {
+              if (exec.get(0) != null)
+                actualSource += exec.get(0);
+          } else {
+              for (int i=0; i<nOut; i++) {
+                BPConnector c = getOutputConnector(i);
+                //System.out.println("Connector "+c.getNode().getName()+"."+c.getLabel()+" "+ (c.isConnected() ? "[*]" : "[ ]") +" -> "+exec.get(i));
 
-        for (int i=0; i<nOut; i++) {
-          BPConnector c = getOutputConnector(i);
-          //System.out.println("Connector "+c.getNode().getName()+"."+c.getLabel()+" "+ (c.isConnected() ? "[*]" : "[ ]") +" -> "+exec.get(i));
-
-          if (c.isExec()) {
-            actualSource = actualSource.replace("exec{"+i+"}", c.isConnected() ? (exec.get(i) != null ? exec.get(i) : ""): "");
+                if (c.isExec()) {
+                  actualSource = actualSource.replace("exec{"+i+"}", c.isConnected() ? (exec.get(i) != null ? exec.get(i) : ""): "");
+                }
+              }
           }
-        }
 
         return actualSource;
     }

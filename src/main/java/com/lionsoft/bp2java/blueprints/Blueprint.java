@@ -720,20 +720,6 @@ public class Blueprint {
     }
 
     public boolean createImage(String imageFile) {
-
-/*
-        try {
-            imgFile.createNewFile();
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return false;
-        }*/
-/*
-        JGraphXAdapter<String, DefaultEdge> graphAdapter =  new JGraphXAdapter<String, DefaultEdge>(graph);
-        mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
-        layout.execute(graphAdapter.getDefaultParent());*/
-
-
         JGraphXAdapter<BPNode, RelationshipEdge> graphAdapter = new JGraphXAdapter<BPNode, RelationshipEdge>(graph);
         mxIGraphLayout layout = new mxHierarchicalLayout(graphAdapter);
         ((mxHierarchicalLayout)layout).setOrientation(SwingConstants.WEST);

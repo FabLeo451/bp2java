@@ -1,6 +1,11 @@
 package com.lionsoft.bp2java;
 
 import java.util.*;
+import java.io.*;
+
+import java.awt.image.BufferedImage;
+import java.awt.Color;
+
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
@@ -30,6 +35,10 @@ class ExecutionTree {
 
     ExecNode getRoot() {
       return root;
+    }
+
+    DefaultDirectedGraph<ExecNode, RelationshipEdge> getGraph() {
+      return tree;
     }
 /*
     public void fromGraph(DefaultDirectedGraph<BPNode, RelationshipEdge> graph, BPNode startNode) {
@@ -116,7 +125,73 @@ class ExecutionTree {
         }
     }
 
+    /**
+     * Reduce the tree
+     */
     public void reduce() {
-        root.reduce();
+        int n = 0;
+
+        saveAsImage("/media/data/Source/JLogic-all/tree-before.png");
+
+        while(true) {
+            ReductionResult result = root.reduce();
+
+            if (!result.hasReduction())
+                break;
+
+            n ++;
+
+            // Detach all the common tails
+            for (ExecNode node: result.getStartNodes()) {
+                detach(node);
+            }
+
+            // Attach new parent node to one tail with an edge of type FOLLOWS
+            RelationshipEdge followsEdge = new RelationshipEdge();
+            followsEdge.setType(RelationshipEdge.FOLLOWS);
+            followsEdge.setLabel("FOLLOWS");
+            tree.addEdge(result.getNewParent(), result.getStartNodes().get(0), followsEdge);
+            System.out.println(result.getNewParent().getNode().toString()+" -> " + result.getStartNodes().get(0).getNode().toString());
+        }
+
+        System.out.println("Reductions: " + n);
+        saveAsImage("/media/data/Source/JLogic-all/tree.png");
+    }
+
+    /**
+     * Remove all incoming edges of a node
+     */
+    public void detach(ExecNode node) {
+        Set<RelationshipEdge> edges = tree.incomingEdgesOf(node);
+        Iterator<RelationshipEdge> it = edges.iterator();
+
+        // Avoid java.util.ConcurrentModificationException
+        List<RelationshipEdge> toBeremoved = new ArrayList<RelationshipEdge>();
+
+        while (it.hasNext())
+            toBeremoved.add(it.next());
+
+        for (RelationshipEdge e: toBeremoved)
+            tree.removeEdge(e);
+    }
+
+    public boolean saveAsImage(String imageFile) {
+        JGraphXAdapter<ExecNode, RelationshipEdge> graphAdapter = new JGraphXAdapter<ExecNode, RelationshipEdge>(tree);
+        mxIGraphLayout layout = new mxHierarchicalLayout(graphAdapter);
+        ((mxHierarchicalLayout)layout).setOrientation(SwingConstants.WEST);
+        layout.execute(graphAdapter.getDefaultParent());
+
+        BufferedImage image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2, Color.WHITE, true, null);
+        File file = new File(imageFile);
+
+        try {
+            ImageIO.write(image, "PNG", file);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+        //ListenableGraph<BPNode, DefaultEdge> g = new DefaultListenableGraph<>(graph);
+
+        return true;
     }
 };

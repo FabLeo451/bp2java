@@ -29,60 +29,52 @@ class ExecNode {
 
     public String toJava() {
         // Set subsequent source
+        String follows = "";
         Set<RelationshipEdge> edges = tree.getOutgoinEdges(this);
         Iterator<RelationshipEdge> it = edges.iterator();
+
         while (it.hasNext()) {
             RelationshipEdge edge = it.next();
             //System.out.println(node.getName()+"  Connector "+ (edge.getConnector() != null ? edge.getConnector().getIndex() : "null"));
-            if (edge.getConnector() != null) {
-                int i = edge.getConnector().getIndex();
-                ExecNode branch = (ExecNode) edge.getTarget();
-                //System.out.println("  Getting Java from "+branch.toString());
-                node.setExec(i, branch.toJava());
+            ExecNode branch = (ExecNode) edge.getTarget();
+
+            switch (edge.getType()) {
+                case RelationshipEdge.BRANCH:
+                    if (edge.getConnector() != null) {
+                        int i = edge.getConnector().getIndex();
+                        //System.out.println("  Getting Java from "+branch.toString());
+                        node.setExec(i, branch.toJava());
+                    }
+                    break;
+
+                case RelationshipEdge.FOLLOWS:
+                    //node.setExec(0, "");
+                    follows = branch.toJava();
+                    break;
+
+                default:
+                    break;
             }
         }
 
-        return node.toJava();
+        return(node.toJava() + follows);
     }
 
-    public List<List<ExecNode>> getSequences() {
-        List<List<ExecNode>> list = new ArrayList<List<ExecNode>>();
-
-        Set<RelationshipEdge> edges = tree.getOutgoinEdges(this);
-
-        if (edges.size() == 0) {
-            List<ExecNode> sequence = new ArrayList<ExecNode>();
-            //sequence.add(this);
-            list.add(sequence);
-        } else {
-            // Iterate children
-            Iterator<RelationshipEdge> it = edges.iterator();
-            while (it.hasNext()) {
-                RelationshipEdge edge = it.next();
-                ExecNode child = (ExecNode) edge.getTarget();
-
-                // Get children sequences
-                List<List<ExecNode>> sequences = child.getSequences();
-
-                // Prepend current node to all subsequences
-                for (List<ExecNode> s: sequences) {
-                    s.add(0, child);
-                    list.add(s);
-                }
-            }
-        }
-
-        return list;
-    }
-
-    public void reduce() {
+    /**
+     * Reduce the subtree starting at this node
+     */
+    public ReductionResult reduce() {
         // Reduce children
         Set<RelationshipEdge> edges = tree.getOutgoinEdges(this);
         Iterator<RelationshipEdge> it = edges.iterator();
+
         while (it.hasNext()) {
             RelationshipEdge edge = it.next();
             ExecNode child = (ExecNode) edge.getTarget();
-            child.reduce();
+            ReductionResult r = child.reduce();
+
+            if (r.hasReduction())
+                return r;
         }
 
         // Get sequences of this node
@@ -101,21 +93,87 @@ class ExecNode {
         }
 
         // Search common tail
-        BPNode start = findCommonTail(sequences);
+        List<ExecNode> startNodes = findCommonTail(sequences);
 
-        if (start != null)
-            System.out.println("Found common tail starting at "+start.toString());
+        if (startNodes != null && startNodes.size() > 0) {
+            System.out.println("  Found common tail starting at "+startNodes.get(0).getNode().toString());
+
+            return(new ReductionResult(this, startNodes));
+        }
+
+        return(new ReductionResult());
+    }
+
+    public RelationshipEdge getFollowsEdge() {
+        Set<RelationshipEdge> edges = tree.getOutgoinEdges(this);
+        Iterator<RelationshipEdge> it = edges.iterator();
+
+        while (it.hasNext()) {
+            RelationshipEdge e = it.next();
+
+            if (e.isFollows())
+                return e;
+        }
+
+        return null;
+    }
+
+    public boolean hasFollows() {
+        return(getFollowsEdge() != null);
+    }
+
+    /**
+     * Get the sequences of all children
+     */
+    public List<List<ExecNode>> getSequences() {
+        List<List<ExecNode>> list = new ArrayList<List<ExecNode>>();
+
+        Set<RelationshipEdge> edges = tree.getOutgoinEdges(this);
+
+        if (edges.size() == 0) {
+            // Return an empty list
+            List<ExecNode> sequence = new ArrayList<ExecNode>();
+            list.add(sequence);
+        } else {
+            // If this node has a 'follows' edge (it's been already reduced) use only the follows edge
+            if (hasFollows()) {
+                ExecNode startFollows = (ExecNode) getFollowsEdge().getTarget();
+                List<List<ExecNode>> sequences = startFollows.getSequences();
+                for (List<ExecNode> s: sequences) {
+                    s.add(0, startFollows);
+                    list.add(s);
+                }
+            } else {
+                // Iterate children
+                Iterator<RelationshipEdge> it = edges.iterator();
+                while (it.hasNext()) {
+                    RelationshipEdge edge = it.next();
+                    ExecNode child = (ExecNode) edge.getTarget();
+
+                    // Get children sequences
+                    List<List<ExecNode>> sequences = child.getSequences();
+
+                    // Prepend the starting node to all subsequences
+                    for (List<ExecNode> s: sequences) {
+                        s.add(0, child);
+                        list.add(s);
+                    }
+                }
+            }
+        }
+
+        return list;
     }
 
     /**
      * Check if list of sequences have a common tail
-     - 3 Compare integer
+     - Node: 3 Compare integer
        5 Compare integer  6 Print String  8 Print String  10 Print String  2 Return
        10 Print String  2 Return
        4 Print String  10 Print String  2 Return
      Found common tail starting at 10 Print String
      */
-    public BPNode findCommonTail(List<List<ExecNode>> sequences) {
+    public List<ExecNode> findCommonTail(List<List<ExecNode>> sequences) {
         if (sequences.size() < 2)
             return null;
 
@@ -131,6 +189,8 @@ class ExecNode {
         for (int i=0; i<masterSeq.size(); i++) {
             ExecNode m = masterSeq.get(i);
 
+            // Check node m in all sequences at position i
+
             boolean all = true;
 
             for (int k=1; k<sequences.size(); k++) {
@@ -143,6 +203,8 @@ class ExecNode {
 
                 ExecNode t = targetSeq.get(i);
 
+                System.out.println(m.getNode() +" "+ t.getNode() +": "+(m.getNode() != t.getNode()));
+
                 if (m.getNode() != t.getNode()){
                     all = false;
                     break;
@@ -151,15 +213,26 @@ class ExecNode {
 
             if (all)
                 startPos = i;
+
+            if (startPos == -1)
+                break;
         }
 
-        BPNode start = startPos > -1 ? masterSeq.get(startPos).getNode() : null;
+        List<ExecNode> result = new ArrayList<ExecNode>();
+
+        if (startPos > -1) {
+            for (List<ExecNode> seq: sequences) {
+                result.add(seq.get(startPos));
+            }
+        }
+
+        //BPNode start = startPos > -1 ? masterSeq.get(startPos).getNode() : null;
 
         // Reverse sequences again
         for (List<ExecNode> seq: sequences) {
             Collections.reverse(seq);
         }
 
-        return(start);
+        return(result);
     }
 };

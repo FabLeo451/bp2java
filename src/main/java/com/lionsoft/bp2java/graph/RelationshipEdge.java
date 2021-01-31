@@ -6,8 +6,12 @@ import org.jgrapht.graph.*;
 
 
 class RelationshipEdge extends DefaultEdge {
-    private String label;
-    private BPConnector from;
+    public static final int BRANCH = 0;
+    public static final int FOLLOWS = 1;
+
+    String label;
+    BPConnector from;
+    int type = BRANCH;
 
     public RelationshipEdge(String label, BPConnector from) {
         super();
@@ -33,12 +37,32 @@ class RelationshipEdge extends DefaultEdge {
         return label;
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public BPConnector getConnector() {
         return from;
     }
 
     public Object getTarget() {
         return(super.getTarget());
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public boolean isBranch() {
+        return type == BRANCH;
+    }
+
+    public boolean isFollows() {
+        return type == FOLLOWS;
     }
 
     @Override
