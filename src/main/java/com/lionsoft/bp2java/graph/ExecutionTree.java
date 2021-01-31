@@ -64,6 +64,7 @@ class ExecutionTree {
       this.graph = graph;
 
       go(root);
+      reduce();
     }
 
     public void go(ExecNode start) {
@@ -113,5 +114,9 @@ class ExecutionTree {
             }
             indent -= 4;
         }
+    }
+
+    public void reduce() {
+        root.reduce();
     }
 };
