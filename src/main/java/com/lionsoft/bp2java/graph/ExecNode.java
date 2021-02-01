@@ -80,6 +80,10 @@ class ExecNode {
     public ReductionResult reduce() {
         // Nodes with an iteration connector (For and While loop) must be treated separately
         if (node.getType() == BPNode.WHILE_LOOP) {
+
+            // WHILE LOOP
+
+            // Reduce iteration
             RelationshipEdge edgeIter = getEdgeByConnector(node.getOutputConnector(0));
             ExecNode startIter = (ExecNode) edgeIter.getTarget();
             ReductionResult r = startIter.reduce();
@@ -87,6 +91,7 @@ class ExecNode {
             if (r.hasReduction())
                 return r;
 
+            // Attach completed branch as FOLLOWS
             RelationshipEdge edgeCompl = getEdgeByConnector(node.getOutputConnector(1));
 
             if (edgeCompl != null) {
@@ -98,6 +103,26 @@ class ExecNode {
             }
         } else if (node.getType() == BPNode.FOR_LOOP) {
 
+            // FOR LOOP
+
+            // Reduce iteration
+            RelationshipEdge edgeIter = getEdgeByConnector(node.getOutputConnector(0));
+            ExecNode startIter = (ExecNode) edgeIter.getTarget();
+            ReductionResult r = startIter.reduce();
+
+            if (r.hasReduction())
+                return r;
+
+            // Attach completed branch as FOLLOWS
+            RelationshipEdge edgeCompl = getEdgeByConnector(node.getOutputConnector(2));
+
+            if (edgeCompl != null) {
+                ExecNode startCompl = (ExecNode) edgeCompl.getTarget();
+                //return(completedIter.reduce());
+
+                tree.detach(startCompl);
+                tree.attachFollows(this, startCompl);
+            }
         } else {
             // Reduce children
             Set<RelationshipEdge> edges = tree.getOutgoinEdges(this);
