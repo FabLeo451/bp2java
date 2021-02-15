@@ -12,9 +12,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+		<!--java.version>1.8</java.version-->
+	    <maven.compiler.source>1.8</maven.compiler.source>
+	    <maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
 	<dependencies>
@@ -47,7 +47,8 @@
 	<dependency>
 	    <groupId>org.jgrapht</groupId>
 	    <artifactId>jgrapht-core</artifactId>
-	    <version>1.5.0</version>
+	    <!--version>1.5.0</version--> <!-- Only compatible with Java 11 -->
+		<version>1.3.1</version> <!-- Compatible with Java 8 -->
 	</dependency>
 
 
@@ -55,7 +56,8 @@
 <dependency>
     <groupId>org.jgrapht</groupId>
     <artifactId>jgrapht-ext</artifactId>
-    <version>1.5.0</version>
+	<!--version>1.5.0</version--> <!-- Only compatible with Java 11 -->
+	<version>1.3.1</version> <!-- Compatible with Java 8 -->
 </dependency>
 
 
